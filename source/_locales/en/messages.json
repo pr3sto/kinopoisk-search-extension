@@ -1,0 +1,23 @@
+{
+    "extensionName": {
+        "message": "Kinopoisk Search"
+    },
+    "extensionDescription": {
+        "message": "Search movies, TV series, celebrities using Kinopoisk.ru"
+    },
+    "searchPlaceholder": {
+        "message": "Search..."
+    },
+    "firstSuggestionHeader": {
+        "message": "Maybe you were looking for"
+    },
+    "filmSuggestionHeader": {
+        "message": "Movies"
+    },
+    "peopleSuggestionHeader": {
+        "message": "People"
+    },
+    "allResultsSuggestionHeader": {
+        "message": "All results"
+    }
+}

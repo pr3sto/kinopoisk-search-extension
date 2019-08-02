@@ -1,0 +1,11 @@
+{
+    "extensionName": {
+        "message": "Kinopoisk Search"
+    },
+    "extensionDescription": {
+        "message": "Поиск фильмов, сериалов, звезд на Kinopoisk.ru"
+    },
+    "searchPlaceholder": {
+        "message": "Поиск..."
+    }
+}

@@ -3,10 +3,10 @@
     "version": "1.0",
     "name": "__MSG_extensionName__",
     "description": "__MSG_extensionDescription__",
+    "homepage_url": "https://github.com/pr3sto/kinopoisk-search-extension",
     "default_locale": "en",
     "icons": {
         "16": "img/kinopoisk16.png",
-        "24": "img/kinopoisk24.png",
         "32": "img/kinopoisk32.png",
         "48": "img/kinopoisk48.png",
         "128": "img/kinopoisk128.png"
@@ -14,18 +14,17 @@
     "browser_action": {
         "default_icon": {
             "16": "img/kinopoisk16.png",
-            "24": "img/kinopoisk24.png",
             "32": "img/kinopoisk32.png",
             "48": "img/kinopoisk48.png"
         },
         "default_popup": "popup.html"
     },
     "background": {
-        "scripts": ["eventPage.js"],
+        "scripts": ["contextMenu.js"],
         "persistent": false
     },
     "permissions": [
-        "*://*.kinopoisk.ru/*",
+        "https://www.kinopoisk.ru/*",
         "contextMenus"
     ]
 }

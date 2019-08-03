@@ -3,9 +3,24 @@
         "message": "Kinopoisk Search"
     },
     "extensionDescription": {
-        "message": "Поиск фильмов, сериалов, звезд на Kinopoisk.ru"
+        "message": "Поиск фильмов, сериалов, персон на Kinopoisk.ru"
     },
     "searchPlaceholder": {
-        "message": "Поиск..."
+        "message": "Поиск"
+    },
+    "firstSuggestionHeader": {
+        "message": "Возможно вы искали"
+    },
+    "filmSuggestionHeader": {
+        "message": "Фильмы"
+    },
+    "peopleSuggestionHeader": {
+        "message": "Персоны"
+    },
+    "allResultsSuggestionHeader": {
+        "message": "Все результаты"
+    },
+    "spanIsSerial": {
+        "message": "сериал"
     }
 }

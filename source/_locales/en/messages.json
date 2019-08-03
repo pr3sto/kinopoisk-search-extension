@@ -6,7 +6,7 @@
         "message": "Search movies, TV series, celebrities using Kinopoisk.ru"
     },
     "searchPlaceholder": {
-        "message": "Search..."
+        "message": "Search"
     },
     "firstSuggestionHeader": {
         "message": "Maybe you were looking for"
@@ -15,9 +15,12 @@
         "message": "Movies"
     },
     "peopleSuggestionHeader": {
-        "message": "People"
+        "message": "Celebrities"
     },
     "allResultsSuggestionHeader": {
         "message": "All results"
+    },
+    "spanIsSerial": {
+        "message": "TV series"
     }
 }

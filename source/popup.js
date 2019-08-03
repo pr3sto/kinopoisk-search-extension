@@ -158,11 +158,20 @@ function appendSuggestionItem(element, item) {
 
     if (item.name) {
         var spanSubname = document.createElement("span");
-        if (item.year) {
+        if (item.is_serial || item.year) {
             spanSubname.className = "spanAddCommaSign";
         }
         spanSubname.innerHTML = item.name;
         spanNames.appendChild(spanSubname);
+    }
+
+    if (item.is_serial) {
+        var spanSerial = document.createElement("span");
+        if (item.year) {
+            spanSerial.className = "spanAddCommaSign";
+        }
+        spanSerial.innerHTML = chrome.i18n.getMessage("spanIsSerial");
+        spanNames.appendChild(spanSerial);
     }
 
     spanContent.appendChild(spanNames);

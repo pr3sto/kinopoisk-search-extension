@@ -82,6 +82,7 @@ function createSuggestionsUI(searchText, suggestions) {
     var indexFirstSuggestion = suggestions.findIndex(obj => obj.type == "first");
     var indexFilmSuggestion = suggestions.findIndex(obj => obj.type == "film");
     var indexPeopleSuggestion = suggestions.findIndex(obj => obj.type == "people");
+    var indexCinemaSuggestion = suggestions.findIndex(obj => obj.type == "cinema");
 
     // first suggestion
     var divFirstElement = document.getElementById("divFirstSuggestion");
@@ -119,10 +120,17 @@ function createSuggestionsUI(searchText, suggestions) {
     if (indexPeopleSuggestion != -1) {
         setVisibility(divPeopleElement.parentElement, true);
 
-        var people = suggestions.slice(indexPeopleSuggestion);
-        people.forEach(function (person) {
-            appendSuggestionItem(divPeopleElement, person);
-        });
+        if (indexCinemaSuggestion != -1) {
+            var people = suggestions.slice(indexPeopleSuggestion, indexCinemaSuggestion);
+            people.forEach(function (person) {
+                appendSuggestionItem(divPeopleElement, person);
+            });
+        } else {
+            var people = suggestions.slice(indexPeopleSuggestion);
+            people.forEach(function (person) {
+                appendSuggestionItem(divPeopleElement, person);
+            });
+        }
     } else {
         setVisibility(divPeopleElement.parentElement, false);
     }

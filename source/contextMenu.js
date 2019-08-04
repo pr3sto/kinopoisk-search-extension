@@ -24,9 +24,8 @@ function getKpSearchUrl(searchText) {
 /**
  * Opens page in new tab
  *
- * @param {string} url url of a page
+ * @param {string} pageUrl url of a page
  */
-function openInNewTab(url) {
-    var win = window.open(url, '_blank');
-    win.focus();
+function openInNewTab(pageUrl) {
+    chrome.tabs.create({ url: pageUrl });
 }

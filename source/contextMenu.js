@@ -1,15 +1,12 @@
-chrome.runtime.onInstalled.addListener(function () {
-    chrome.contextMenus.create({
-        id: "kinopoiskSearch",
-        title: chrome.i18n.getMessage("extensionName"),
-        contexts: ["selection"]
-    });
+var id = chrome.contextMenus.create({
+    title: chrome.i18n.getMessage("extensionName"),
+    contexts: ["selection"]
+});
 
-    chrome.contextMenus.onClicked.addListener(function (clickData) {
-        if (clickData.menuItemId == "kinopoiskSearch" && clickData.selectionText) {
-            openInNewTab(getKpSearchUrl(clickData.selectionText));
-        }
-    });
+chrome.contextMenus.onClicked.addListener(function (clickData) {
+    if (clickData.menuItemId == id && clickData.selectionText) {
+        openInNewTab(getKpSearchUrl(clickData.selectionText));
+    }
 });
 
 /**

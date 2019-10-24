@@ -39,6 +39,27 @@ document.addEventListener('DOMContentLoaded', function () {
     searchInput.focus();
 });
 
+// arrow keys navigation
+document.addEventListener('keydown', function(e) {
+    if (e.keyCode == '38' || e.keyCode == '40') {
+        // get the next and prev navigation options for this element
+        var srcElement = e.target;
+        var next = srcElement.dataset.next;
+        var prev = srcElement.dataset.prev;
+
+        // up arrow was pressed and a prev element is defined
+        if (e.keyCode == '38' && prev != undefined) {
+            document.getElementById(prev).focus();
+        }
+        // down arrow was pressed and a next element is defined
+        if (e.keyCode == '40' && next != undefined) {
+            document.getElementById(next).focus();
+        }
+
+        e.preventDefault;
+    }
+});
+
 /**
  * Requests suggestions from kinopoisk and build UI for them
  *
@@ -79,6 +100,8 @@ function createSuggestionsUI(searchText, suggestions) {
         return;
     }
 
+    var arrowNavigationItemsIds = ['inputSearch'];
+
     var indexFirstSuggestion = suggestions.findIndex(obj => obj.type == "first");
     var indexFilmSuggestion = suggestions.findIndex(obj => obj.type == "film");
     var indexPeopleSuggestion = suggestions.findIndex(obj => obj.type == "people");
@@ -90,7 +113,8 @@ function createSuggestionsUI(searchText, suggestions) {
         setVisibility(divFirstElement.parentElement, true);
 
         var first = suggestions[indexFirstSuggestion];
-        appendSuggestionItem(divFirstElement, first);
+        var id = appendSuggestionItem(divFirstElement, first);
+        arrowNavigationItemsIds.push(id);
     } else {
         setVisibility(divFirstElement.parentElement, false);
     }
@@ -103,12 +127,14 @@ function createSuggestionsUI(searchText, suggestions) {
         if (indexPeopleSuggestion != -1) {
             var films = suggestions.slice(indexFilmSuggestion, indexPeopleSuggestion);
             films.forEach(function (film) {
-                appendSuggestionItem(divFilmsElement, film);
+                var id = appendSuggestionItem(divFilmsElement, film);
+                arrowNavigationItemsIds.push(id);
             });
         } else {
             var films = suggestions.slice(indexFilmSuggestion);
             films.forEach(function (film) {
-                appendSuggestionItem(divFilmsElement, film);
+                var id = appendSuggestionItem(divFilmsElement, film);
+                arrowNavigationItemsIds.push(id);
             });
         }
     } else {
@@ -123,16 +149,30 @@ function createSuggestionsUI(searchText, suggestions) {
         if (indexCinemaSuggestion != -1) {
             var people = suggestions.slice(indexPeopleSuggestion, indexCinemaSuggestion);
             people.forEach(function (person) {
-                appendSuggestionItem(divPeopleElement, person);
+                var id = appendSuggestionItem(divPeopleElement, person);
+                arrowNavigationItemsIds.push(id);
             });
         } else {
             var people = suggestions.slice(indexPeopleSuggestion);
             people.forEach(function (person) {
-                appendSuggestionItem(divPeopleElement, person);
+                var id = appendSuggestionItem(divPeopleElement, person);
+                arrowNavigationItemsIds.push(id);
             });
         }
     } else {
         setVisibility(divPeopleElement.parentElement, false);
+    }
+
+    // setup navigation attributes
+    arrowNavigationItemsIds.push('aSuggestionsAllResults');
+    for (i = 0; i < arrowNavigationItemsIds.length; i++) {
+        var element = document.getElementById(arrowNavigationItemsIds[i]);
+        if (i != 0) {
+            element.setAttribute('data-prev', arrowNavigationItemsIds[i-1]);
+        }
+        if (i + 1 < arrowNavigationItemsIds.length) {
+            element.setAttribute('data-next', arrowNavigationItemsIds[i+1])
+        }
     }
 
     document.getElementById("aSuggestionsAllResults").href = getKpSearchUrl(searchText);
@@ -144,12 +184,16 @@ function createSuggestionsUI(searchText, suggestions) {
  *
  * @param {Element} element html element
  * @param {any} item suggestion item
+ * @param {string} id unique id of an item
+ *
+ * @returns {string} id of an element
  */
 function appendSuggestionItem(element, item) {
     var a = document.createElement("a");
     a.href = getKpItemUrl(item.link);
     a.target = "_blank";
     a.className = "aSuggestionItem";
+    a.id = uuid();
 
     var spanContent = document.createElement("span");
     spanContent.className = "spanSuggestionContent";
@@ -211,6 +255,8 @@ function appendSuggestionItem(element, item) {
     }
 
     element.appendChild(a);
+
+    return a.id;
 }
 
 /**
@@ -250,6 +296,8 @@ function setVisibility(element, visiblity) {
  * Creates kinopoisk item url
  *
  * @param {string} itemUrl url on a kinopoisk item
+ *
+ * @returns {string}
  */
 function getKpItemUrl(itemUrl) {
     return "https://www.kinopoisk.ru" + itemUrl;
@@ -259,6 +307,8 @@ function getKpItemUrl(itemUrl) {
  * Creates kinopoisk search request url
  *
  * @param {string} searchText search request text
+ *
+ * @returns {string}
  */
 function getKpSearchUrl(searchText) {
     return "https://www.kinopoisk.ru/index.php?kp_query=" + encodeURIComponent(searchText);
@@ -268,6 +318,8 @@ function getKpSearchUrl(searchText) {
  * Creates kinopoisk suggestions request url
  *
  * @param {string} searchText search request text
+ *
+ * @returns {string}
  */
 function getKpSearchSuggestionsUrl(searchText) {
     return "https://www.kinopoisk.ru/handler_search.php?topsuggest=true&q=" + encodeURIComponent(searchText);
@@ -282,3 +334,15 @@ function openInNewTab(url) {
     var win = window.open(url, '_blank');
     win.focus();
 }
+
+/**
+ * Generates unique id
+ *
+ * @returns {string}
+ */
+function uuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }

@@ -66,9 +66,10 @@ body {
     justify-content: space-between;
     align-items: baseline;
     text-decoration: none;
+    outline: none;
 }
 
-.aSuggestionItem:hover {
+.aSuggestionItem:hover, .aSuggestionItem:focus {
     background: #f2f2f2;
 }
 

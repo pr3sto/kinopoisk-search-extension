@@ -1,4 +1,5 @@
 var id = chrome.contextMenus.create({
+    id: "kinopoiskSearch",
     title: chrome.i18n.getMessage("extensionName"),
     contexts: ["selection"]
 });

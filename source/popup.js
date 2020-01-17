@@ -195,63 +195,76 @@ function appendSuggestionItem(element, item) {
     a.className = "aSuggestionItem";
     a.id = uuid();
 
-    var spanContent = document.createElement("span");
-    spanContent.className = "spanSuggestionContent";
+    var divContent = document.createElement("div");
+    divContent.className = "divSuggestionContent";
 
-    var spanNames = document.createElement("span");
-    spanNames.className = "spanSuggestionNames";
+    // image
+    var divContentImage = document.createElement("div");
+    divContentImage.className = "divSuggestionContentImage";
+
+    if (item.image) {
+        var img = document.createElement("img");
+        img.src = item.image;
+        divContentImage.appendChild(img);
+    } else {
+        var img = document.createElement("div");
+        img.className = "divSuggestionContentImagePlaceholder";
+        divContentImage.appendChild(img);
+    }
+
+    // main
+    var divContentMain = document.createElement("div");
+    divContentMain.className = "divSuggestionContentMain";
 
     if (item.rus) {
-        var spanName = document.createElement("span");
-        spanName.className = "spanSuggestionName";
-        spanName.innerHTML = item.rus;
-        spanNames.appendChild(spanName);
+        var divName = document.createElement("div");
+        divName.className = "divSuggestionName";
+        divName.innerHTML = item.rus;
+        divContentMain.appendChild(divName);
     }
 
+    var spanSubname = document.createElement("span");
+    spanSubname.className = "spanSuggestionContentSubname";
     if (item.name) {
-        var spanSubname = document.createElement("span");
-        if (item.is_serial || item.year) {
-            spanSubname.className = "spanAddCommaSign";
-        }
         spanSubname.innerHTML = item.name;
-        spanNames.appendChild(spanSubname);
     }
-
     if (item.is_serial) {
-        var spanSerial = document.createElement("span");
-        if (item.year) {
-            spanSerial.className = "spanAddCommaSign";
+        if (spanSubname.innerHTML.length > 0) {
+            spanSubname.innerHTML += ', ';
         }
-        spanSerial.innerHTML = chrome.i18n.getMessage("spanIsSerial");
-        spanNames.appendChild(spanSerial);
+        spanSubname.innerHTML += chrome.i18n.getMessage("spanIsSerial");
     }
-
-    spanContent.appendChild(spanNames);
-
     if (item.year) {
-        var spanYear = document.createElement("span");
-        spanYear.innerHTML = item.year;
-        spanContent.appendChild(spanYear);
+        if (spanSubname.innerHTML.length > 0) {
+            spanSubname.innerHTML += ', ';
+        }
+        spanSubname.innerHTML += item.year;
     }
+    divContentMain.appendChild(spanSubname);
 
-    a.appendChild(spanContent);
+    divContent.appendChild(divContentImage);
+    divContent.appendChild(divContentMain);
+    a.appendChild(divContent);
 
+    // rating
     if (item.ur_rating != undefined) {
-        var spanRating = document.createElement("span");
-        spanRating.className = "spanSuggestionItemRating";
+        var divRating = document.createElement("div");
+        divRating.className = "divSuggestionItemRating";
 
         if (item.ur_rating != 0) {
-            spanRating.innerHTML = item.ur_rating;
+            divRating.innerHTML = item.ur_rating;
             if (item.ur_rating < 5) {
-                spanRating.classList.add("negativRating");
+                divRating.classList.add("negativRating");
             } else if (item.ur_rating >= 7) {
-                spanRating.classList.add("positivRating");
+                divRating.classList.add("positivRating");
+            } else {
+                divRating.classList.add("neutralRating");
             }
         } else {
-            spanRating.innerHTML = "&mdash;";
+            divRating.innerHTML = "&mdash;";
         }
 
-        a.appendChild(spanRating);
+        a.appendChild(divRating);
     }
 
     element.appendChild(a);

@@ -22,5 +22,8 @@
     },
     "spanIsSerial": {
         "message": "TV series"
+    },
+    "bookmarkButton": {
+        "message": "Add to bookmarks"
     }
 }

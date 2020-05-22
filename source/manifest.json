@@ -25,6 +25,7 @@
     },
     "permissions": [
         "https://www.kinopoisk.ru/*",
-        "contextMenus"
+        "contextMenus",
+        "bookmarks"
     ]
 }

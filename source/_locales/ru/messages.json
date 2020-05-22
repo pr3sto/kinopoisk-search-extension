@@ -22,5 +22,8 @@
     },
     "spanIsSerial": {
         "message": "сериал"
+    },
+    "bookmarkButton": {
+        "message": "Добавить в закладки"
     }
 }

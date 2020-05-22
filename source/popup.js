@@ -267,6 +267,29 @@ function appendSuggestionItem(element, item) {
         a.appendChild(divRating);
     }
 
+    // bookmark button
+    var divBookmark = document.createElement("div");
+    divBookmark.className = "divSuggestionItemBookmark";
+    divBookmark.title = chrome.i18n.getMessage("bookmarkButton");
+
+    divBookmark.addEventListener("click", function () {
+        if (event.stopPropagation) {
+            // Stop propagation
+            event.stopPropagation();
+            // Stop default action
+            event.preventDefault();
+        }
+
+        console.log(item.rus);
+        console.log(getKpItemUrl(item.link));
+
+        chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
+            console.log(bookmarkTreeNodes[0]);
+        });
+    });
+
+    a.appendChild(divBookmark);
+
     element.appendChild(a);
 
     return a.id;

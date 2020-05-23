@@ -1,7 +1,27 @@
 var searchRequestTimeout;
 
-document.addEventListener('DOMContentLoaded', function () {
+var divBookmarkDroppdownContent = document.createElement("div");
+divBookmarkDroppdownContent.className = "divSuggestionItemBookmarkDropdown";
+divBookmarkDroppdownContent.id = "divSuggestionItemBookmarkDropdown";
+
+document.addEventListener("DOMContentLoaded", function () {
     localizePageUI();
+
+    // innitialize dropdown with bookmark folders
+    chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
+        var bookmarkFolders = listFolders(bookmarkTreeNodes[0]);
+        bookmarkFolders.forEach(folder => {
+            var a1 = document.createElement("a");
+            a1.innerHTML = folder.title;
+            divBookmarkDroppdownContent.appendChild(a1);
+
+            // chrome.bookmarks.create({
+            //     'parentId': extensionsFolderId,
+            //     'title': item.rus,
+            //     'url': getKpItemUrl(item.link)
+            // });
+        });
+    });
 
     var searchButton = document.getElementById("btnSearch");
     var searchInput = document.getElementById("inputSearch");
@@ -40,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // arrow keys navigation
-document.addEventListener('keydown', function(e) {
+document.addEventListener("keydown", function (e) {
     if (e.keyCode == '38' || e.keyCode == '40') {
         // get the next and prev navigation options for this element
         var srcElement = e.target;
@@ -61,14 +81,64 @@ document.addEventListener('keydown', function(e) {
 });
 
 /**
+ * Localizes page using chrome.i18n.getMessage()
+ */
+function localizePageUI() {
+    var objects = document.getElementsByTagName("html");
+    for (var j = 0; j < objects.length; j++) {
+        var obj = objects[j];
+
+        var oldHtml = obj.innerHTML.toString();
+        var newHtml = oldHtml.replace(/__MSG_(\w+)__/g, function (match, v1) {
+            return v1 ? chrome.i18n.getMessage(v1) : "";
+        });
+
+        if (newHtml != oldHtml) {
+            obj.innerHTML = newHtml;
+        }
+    }
+}
+
+/**
+ * List all folders in chrome bookmarks
+ *
+ * @param {Element} bookmarkNode bookmark node element
+ *
+ * @returns {array} array of folders
+ */
+function listFolders(bookmarkNode) {
+    var list = [];
+
+    // not a floder
+    if (!bookmarkNode.children) {
+        return list;
+    }
+
+    // add current folder if it is not a root folder
+    if (bookmarkNode.id != 0) {
+        list = list.concat({
+            id: bookmarkNode.id,
+            title: bookmarkNode.title
+        });
+    }
+
+    // add folders recursively
+    for (var i = 0; i < bookmarkNode.children.length; i++) {
+        list = list.concat(listFolders(bookmarkNode.children[i]));
+    }
+
+    return list;
+}
+
+/**
  * Requests suggestions from kinopoisk and build UI for them
  *
  * @param {string} searchText search request text
  */
 function requestSuggestions(searchText) {
     xhr = new XMLHttpRequest();
-    xhr.open('GET', getKpSearchSuggestionsUrl(searchText));
-    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.open("GET", getKpSearchSuggestionsUrl(searchText));
+    xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onload = function () {
         if (xhr.status == 200) {
             createSuggestionsUI(searchText, JSON.parse(xhr.responseText));
@@ -100,7 +170,7 @@ function createSuggestionsUI(searchText, suggestions) {
         return;
     }
 
-    var arrowNavigationItemsIds = ['inputSearch'];
+    var arrowNavigationItemsIds = ["inputSearch"];
 
     var indexFirstSuggestion = suggestions.findIndex(obj => obj.type == "first");
     var indexFilmSuggestion = suggestions.findIndex(obj => obj.type == "film");
@@ -164,14 +234,14 @@ function createSuggestionsUI(searchText, suggestions) {
     }
 
     // setup navigation attributes
-    arrowNavigationItemsIds.push('aSuggestionsAllResults');
+    arrowNavigationItemsIds.push("aSuggestionsAllResults");
     for (i = 0; i < arrowNavigationItemsIds.length; i++) {
         var element = document.getElementById(arrowNavigationItemsIds[i]);
         if (i != 0) {
-            element.setAttribute('data-prev', arrowNavigationItemsIds[i-1]);
+            element.setAttribute("data-prev", arrowNavigationItemsIds[i - 1]);
         }
         if (i + 1 < arrowNavigationItemsIds.length) {
-            element.setAttribute('data-next', arrowNavigationItemsIds[i+1])
+            element.setAttribute("data-next", arrowNavigationItemsIds[i + 1])
         }
     }
 
@@ -230,13 +300,13 @@ function appendSuggestionItem(element, item) {
     }
     if (item.is_serial) {
         if (spanSubname.innerHTML.length > 0) {
-            spanSubname.innerHTML += ', ';
+            spanSubname.innerHTML += ", ";
         }
         spanSubname.innerHTML += chrome.i18n.getMessage("spanIsSerial");
     }
     if (item.year) {
         if (spanSubname.innerHTML.length > 0) {
-            spanSubname.innerHTML += ', ';
+            spanSubname.innerHTML += ", ";
         }
         spanSubname.innerHTML += item.year;
     }
@@ -267,51 +337,51 @@ function appendSuggestionItem(element, item) {
         a.appendChild(divRating);
     }
 
-    // bookmark button
+    // bookmark
     var divBookmark = document.createElement("div");
     divBookmark.className = "divSuggestionItemBookmark";
-    divBookmark.title = chrome.i18n.getMessage("bookmarkButton");
 
-    divBookmark.addEventListener("click", function () {
+    // bookmark button
+    var divBookmarkButton = document.createElement("div");
+    divBookmarkButton.className = "divSuggestionItemBookmarkButton";
+    divBookmarkButton.title = chrome.i18n.getMessage("bookmarkButton");
+    divBookmarkButton.addEventListener("click", function () {
         if (event.stopPropagation) {
-            // Stop propagation
             event.stopPropagation();
-            // Stop default action
             event.preventDefault();
         }
 
-        console.log(item.rus);
-        console.log(getKpItemUrl(item.link));
+        var buttonCenterX = divBookmarkButton.getBoundingClientRect().top + 18;
 
-        chrome.bookmarks.getTree(function(bookmarkTreeNodes) {
-            console.log(bookmarkTreeNodes[0]);
-        });
+        console.log(buttonCenterX);
+
+        // dropdown direction (up or down in relation to button)
+        if (buttonCenterX + 150 > document.body.clientHeight) {
+            if (buttonCenterX < 150) {
+                var pos = 150 - buttonCenterX - 10;
+                divBookmarkDroppdownContent.style = "bottom:"+pos+"px;";
+            }
+            else {
+                divBookmarkDroppdownContent.style = "bottom:10px;";
+            }
+        } else {
+            divBookmarkDroppdownContent.style = "top:10px;";
+        }
+
+        if (divBookmark.lastChild.id == "divSuggestionItemBookmarkDropdown") {
+            divBookmark.removeChild(divBookmarkDroppdownContent);
+        } else {
+            divBookmark.appendChild(divBookmarkDroppdownContent);
+        }
     });
+
+    divBookmark.appendChild(divBookmarkButton);
 
     a.appendChild(divBookmark);
 
     element.appendChild(a);
 
     return a.id;
-}
-
-/**
- * Localizes page using chrome.i18n.getMessage()
- */
-function localizePageUI() {
-    var objects = document.getElementsByTagName('html');
-    for (var j = 0; j < objects.length; j++) {
-        var obj = objects[j];
-
-        var oldHtml = obj.innerHTML.toString();
-        var newHtml = oldHtml.replace(/__MSG_(\w+)__/g, function (match, v1) {
-            return v1 ? chrome.i18n.getMessage(v1) : "";
-        });
-
-        if (newHtml != oldHtml) {
-            obj.innerHTML = newHtml;
-        }
-    }
 }
 
 /**
@@ -367,8 +437,9 @@ function getKpSearchSuggestionsUrl(searchText) {
  * @param {string} url url of a page
  */
 function openInNewTab(url) {
-    var win = window.open(url, '_blank');
-    win.focus();
+    chrome.tabs.create({
+        url: pageUrl
+    });
 }
 
 /**
@@ -377,8 +448,9 @@ function openInNewTab(url) {
  * @returns {string}
  */
 function uuid() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0,
+            v = c == "x" ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
     });
-  }
+}

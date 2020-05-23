@@ -11,15 +11,34 @@ document.addEventListener("DOMContentLoaded", function () {
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
         var bookmarkFolders = listFolders(bookmarkTreeNodes[0]);
         bookmarkFolders.forEach(folder => {
-            var a1 = document.createElement("a");
-            a1.innerHTML = folder.title;
-            divBookmarkDroppdownContent.appendChild(a1);
+            var div = document.createElement("div");
+            var icon = document.createElement("span");
+            icon.className = "folder";
 
-            // chrome.bookmarks.create({
-            //     'parentId': extensionsFolderId,
-            //     'title': item.rus,
-            //     'url': getKpItemUrl(item.link)
-            // });
+            var span = document.createElement("span");
+            span.innerHTML = folder.title;
+            span.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                console.log(divBookmarkDroppdownContent.dataset.title);
+                console.log(divBookmarkDroppdownContent.dataset.url);
+
+                chrome.bookmarks.create({
+                    'parentId': folder.id,
+                    'title': divBookmarkDroppdownContent.dataset.title,
+                    'url': divBookmarkDroppdownContent.dataset.url
+                });
+
+                // close dropdown
+                var parent = divBookmarkDroppdownContent.parentElement;
+                if (parent) {
+                    parent.removeChild(divBookmarkDroppdownContent);
+                }
+            });
+            div.appendChild(icon);
+            div.appendChild(span);
+            divBookmarkDroppdownContent.appendChild(div);
         });
     });
 
@@ -60,19 +79,19 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // arrow keys navigation
-document.addEventListener("keydown", function (e) {
-    if (e.keyCode == '38' || e.keyCode == '40') {
+document.addEventListener("keydown", function (event) {
+    if (event.keyCode == '38' || event.keyCode == '40') {
         // get the next and prev navigation options for this element
-        var srcElement = e.target;
-        var next = srcElement.dataset.next;
-        var prev = srcElement.dataset.prev;
+        var element = event.target;
+        var next = element.dataset.next;
+        var prev = element.dataset.prev;
 
         // up arrow was pressed and a prev element is defined
-        if (e.keyCode == '38' && prev != undefined) {
+        if (event.keyCode == '38' && prev != undefined) {
             document.getElementById(prev).focus();
         }
         // down arrow was pressed and a next element is defined
-        if (e.keyCode == '40' && next != undefined) {
+        if (event.keyCode == '40' && next != undefined) {
             document.getElementById(next).focus();
         }
 
@@ -241,7 +260,7 @@ function createSuggestionsUI(searchText, suggestions) {
             element.setAttribute("data-prev", arrowNavigationItemsIds[i - 1]);
         }
         if (i + 1 < arrowNavigationItemsIds.length) {
-            element.setAttribute("data-next", arrowNavigationItemsIds[i + 1])
+            element.setAttribute("data-next", arrowNavigationItemsIds[i + 1]);
         }
     }
 
@@ -345,15 +364,12 @@ function appendSuggestionItem(element, item) {
     var divBookmarkButton = document.createElement("div");
     divBookmarkButton.className = "divSuggestionItemBookmarkButton";
     divBookmarkButton.title = chrome.i18n.getMessage("bookmarkButton");
-    divBookmarkButton.addEventListener("click", function () {
-        if (event.stopPropagation) {
-            event.stopPropagation();
-            event.preventDefault();
-        }
+    divBookmarkButton.addEventListener("click", function (event) {
+        var element = event.target;
+        event.stopPropagation();
+        event.preventDefault();
 
-        var buttonCenterX = divBookmarkButton.getBoundingClientRect().top + 18;
-
-        console.log(buttonCenterX);
+        var buttonCenterX = element.getBoundingClientRect().top + 18;
 
         // dropdown direction (up or down in relation to button)
         if (buttonCenterX + 150 > document.body.clientHeight) {
@@ -368,9 +384,12 @@ function appendSuggestionItem(element, item) {
             divBookmarkDroppdownContent.style = "top:10px;";
         }
 
+        // add or delete dropdown on button click
         if (divBookmark.lastChild.id == "divSuggestionItemBookmarkDropdown") {
             divBookmark.removeChild(divBookmarkDroppdownContent);
         } else {
+            divBookmarkDroppdownContent.setAttribute("data-title", item.rus);
+            divBookmarkDroppdownContent.setAttribute("data-url", getKpItemUrl(item.link));
             divBookmark.appendChild(divBookmarkDroppdownContent);
         }
     });

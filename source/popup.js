@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
         bookmarkFolders.forEach(folder => {
             var div = document.createElement("div");
             var icon = document.createElement("span");
-            icon.className = "folder";
+            icon.className = "spanBookmarkFolderIcon";
 
             var span = document.createElement("span");
             span.innerHTML = folder.title;
@@ -343,9 +343,9 @@ function appendSuggestionItem(element, item) {
         if (item.ur_rating != 0) {
             divRating.innerHTML = item.ur_rating;
             if (item.ur_rating < 5) {
-                divRating.classList.add("negativRating");
+                divRating.classList.add("negativeRating");
             } else if (item.ur_rating >= 7) {
-                divRating.classList.add("positivRating");
+                divRating.classList.add("positiveRating");
             } else {
                 divRating.classList.add("neutralRating");
             }

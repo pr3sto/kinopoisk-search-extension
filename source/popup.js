@@ -12,12 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var bookmarkFolders = listFolders(bookmarkTreeNodes[0]);
         bookmarkFolders.forEach(folder => {
             var div = document.createElement("div");
-            var icon = document.createElement("span");
-            icon.className = "spanBookmarkFolderIcon";
-
-            var span = document.createElement("span");
-            span.innerHTML = folder.title;
-            span.addEventListener("click", function (event) {
+            div.addEventListener("click", function (event) {
                 event.preventDefault();
                 event.stopPropagation();
 
@@ -36,6 +31,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     parent.removeChild(divBookmarkDroppdownContent);
                 }
             });
+
+            var icon = document.createElement("span");
+            icon.className = "spanBookmarkFolderIcon";
+
+            var span = document.createElement("span");
+            span.innerHTML = folder.title;
+
             div.appendChild(icon);
             div.appendChild(span);
             divBookmarkDroppdownContent.appendChild(div);
@@ -95,7 +97,7 @@ document.addEventListener("keydown", function (event) {
             document.getElementById(next).focus();
         }
 
-        e.preventDefault;
+        event.preventDefault;
     }
 });
 
@@ -453,9 +455,9 @@ function getKpSearchSuggestionsUrl(searchText) {
 /**
  * Opens page in new tab
  *
- * @param {string} url url of a page
+ * @param {string} pageUrl url of a page
  */
-function openInNewTab(url) {
+function openInNewTab(pageUrl) {
     chrome.tabs.create({
         url: pageUrl
     });

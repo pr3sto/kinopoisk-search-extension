@@ -166,7 +166,7 @@ body {
 .divSuggestionItemBookmarkDropdown > span {
     display: block;
     padding: 5px 15px;
-    width: calc(100px - 30px);
+    width: calc(100% - 30px);
     font-size: 14px;
     color: #333;
     overflow: hidden;

@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
         var bookmarkFolders = listFolders(bookmarkTreeNodes[0]);
         bookmarkFolders.forEach(folder => {
-            var div = document.createElement("div");
-            div.addEventListener("click", function (event) {
+            var span = document.createElement("span");
+            span.addEventListener("click", function (event) {
                 event.preventDefault();
                 event.stopPropagation();
 
@@ -33,14 +33,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             var icon = document.createElement("span");
-            icon.className = "spanBookmarkFolderIcon";
+            icon.className = "spanSuggestionItemBookmarkDropdownIcon";
 
-            var span = document.createElement("span");
-            span.innerHTML = folder.title;
+            span.appendChild(icon);
+            span.innerHTML += folder.title;
 
-            div.appendChild(icon);
-            div.appendChild(span);
-            divBookmarkDroppdownContent.appendChild(div);
+            divBookmarkDroppdownContent.appendChild(span);
         });
     });
 

@@ -16,9 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 event.preventDefault();
                 event.stopPropagation();
 
-                console.log(divBookmarkDroppdownContent.dataset.title);
-                console.log(divBookmarkDroppdownContent.dataset.url);
-
                 chrome.bookmarks.create({
                     'parentId': folder.id,
                     'title': divBookmarkDroppdownContent.dataset.title,
@@ -53,13 +50,15 @@ document.addEventListener("DOMContentLoaded", function () {
             searchInput.focus();
         }
     });
+
     // Enter button click
     searchInput.addEventListener("keyup", function (event) {
-        if (event.keyCode === 13) {
+        if (isButtonEnter(event)) {
             event.preventDefault();
             searchButton.click();
         }
     });
+
     // on text typing
     searchInput.addEventListener("input", function () {
         if (searchInput.value.length > 1) {
@@ -75,28 +74,28 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // arrow keys navigation
+    document.addEventListener("keydown", function (event) {
+        if (isButtonUp(event) || isButtonDown(event)) {
+            // get the next and prev navigation options for this element
+            var element = event.target;
+            var next = element.dataset.next;
+            var prev = element.dataset.prev;
+
+            // up arrow was pressed and a prev element is defined
+            if (isButtonUp(event) && prev != undefined) {
+                document.getElementById(prev).focus();
+            }
+            // down arrow was pressed and a next element is defined
+            if (isButtonDown(event) && next != undefined) {
+                document.getElementById(next).focus();
+            }
+
+            event.preventDefault;
+        }
+    });
+
     searchInput.focus();
-});
-
-// arrow keys navigation
-document.addEventListener("keydown", function (event) {
-    if (event.keyCode == '38' || event.keyCode == '40') {
-        // get the next and prev navigation options for this element
-        var element = event.target;
-        var next = element.dataset.next;
-        var prev = element.dataset.prev;
-
-        // up arrow was pressed and a prev element is defined
-        if (event.keyCode == '38' && prev != undefined) {
-            document.getElementById(prev).focus();
-        }
-        // down arrow was pressed and a next element is defined
-        if (event.keyCode == '40' && next != undefined) {
-            document.getElementById(next).focus();
-        }
-
-        event.preventDefault;
-    }
 });
 
 /**
@@ -121,7 +120,7 @@ function localizePageUI() {
 /**
  * List all folders in chrome bookmarks
  *
- * @param {Element} bookmarkNode bookmark node element
+ * @param {any} bookmarkNode bookmark node element
  *
  * @returns {array} array of folders
  */
@@ -157,7 +156,8 @@ function listFolders(bookmarkNode) {
 function requestSuggestions(searchText) {
     xhr = new XMLHttpRequest();
     xhr.open("GET", getKpSearchSuggestionsUrl(searchText));
-    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("x-requested-with", "XMLHttpRequest");
     xhr.onload = function () {
         if (xhr.status == 200) {
             createSuggestionsUI(searchText, JSON.parse(xhr.responseText));
@@ -180,74 +180,70 @@ function resetSuggestionsUI() {
  * Creates UI for suggestions
  *
  * @param {string} searchText search request text
- * @param {array} suggestions array of suggestion items
+ * @param {any} jsonResponse kinopoisk response json object
  */
-function createSuggestionsUI(searchText, suggestions) {
+function createSuggestionsUI(searchText, jsonResponse) {
     resetSuggestionsUI();
 
-    if (suggestions.length == 0) {
+    if (!jsonResponse || !jsonResponse.suggest || !jsonResponse.suggest.top) {
         return;
     }
+    var jsonSuggestions = jsonResponse.suggest.top;
+    if (!jsonSuggestions.topResult &&
+        (!jsonSuggestions.movies || jsonSuggestions.movies.length == 0) &&
+        (!jsonSuggestions.persons || jsonSuggestions.persons.length == 0)) {
+            return;
+        }
+
 
     var arrowNavigationItemsIds = ["inputSearch"];
 
-    var indexFirstSuggestion = suggestions.findIndex(obj => obj.type == "first");
-    var indexFilmSuggestion = suggestions.findIndex(obj => obj.type == "film");
-    var indexPeopleSuggestion = suggestions.findIndex(obj => obj.type == "people");
-    var indexCinemaSuggestion = suggestions.findIndex(obj => obj.type == "cinema");
-
     // first suggestion
     var divFirstElement = document.getElementById("divFirstSuggestion");
-    if (indexFirstSuggestion != -1) {
-        setVisibility(divFirstElement.parentElement, true);
+    if (jsonSuggestions.topResult) {
+        var firstItem = null;
+        var first = get(jsonSuggestions, "topResult.global");
+        if (first) {
+            if (first.__typename == "TvSeries" || first.__typename == "Film") {
+                firstItem = createFilmItem(first);
+            } else if (first.__typename == "Person") {
+                firstItem = createPersonItem(first);
+            }
+        }
 
-        var first = suggestions[indexFirstSuggestion];
-        var id = appendSuggestionItem(divFirstElement, first);
-        arrowNavigationItemsIds.push(id);
+        if (firstItem) {
+            setVisibility(divFirstElement.parentElement, true);
+            var id = appendSuggestionItem(divFirstElement, firstItem);
+            arrowNavigationItemsIds.push(id);
+        } else {
+            setVisibility(divFirstElement.parentElement, false);
+        }
     } else {
         setVisibility(divFirstElement.parentElement, false);
     }
 
     // film suggestions
     var divFilmsElement = document.getElementById("divFilmSuggestions");
-    if (indexFilmSuggestion != -1) {
+    if (jsonSuggestions.movies && jsonSuggestions.movies.length > 0) {
         setVisibility(divFilmsElement.parentElement, true);
-
-        if (indexPeopleSuggestion != -1) {
-            var films = suggestions.slice(indexFilmSuggestion, indexPeopleSuggestion);
-            films.forEach(function (film) {
-                var id = appendSuggestionItem(divFilmsElement, film);
-                arrowNavigationItemsIds.push(id);
-            });
-        } else {
-            var films = suggestions.slice(indexFilmSuggestion);
-            films.forEach(function (film) {
-                var id = appendSuggestionItem(divFilmsElement, film);
-                arrowNavigationItemsIds.push(id);
-            });
-        }
+        jsonSuggestions.movies.forEach(function (film) {
+            var filmItem = createFilmItem(film.movie);
+            var id = appendSuggestionItem(divFilmsElement, filmItem);
+            arrowNavigationItemsIds.push(id);
+        });
     } else {
         setVisibility(divFilmsElement.parentElement, false);
     }
 
     // people suggestions
     var divPeopleElement = document.getElementById("divPeopleSuggestions");
-    if (indexPeopleSuggestion != -1) {
+    if (jsonSuggestions.persons && jsonSuggestions.persons.length > 0) {
         setVisibility(divPeopleElement.parentElement, true);
-
-        if (indexCinemaSuggestion != -1) {
-            var people = suggestions.slice(indexPeopleSuggestion, indexCinemaSuggestion);
-            people.forEach(function (person) {
-                var id = appendSuggestionItem(divPeopleElement, person);
-                arrowNavigationItemsIds.push(id);
-            });
-        } else {
-            var people = suggestions.slice(indexPeopleSuggestion);
-            people.forEach(function (person) {
-                var id = appendSuggestionItem(divPeopleElement, person);
-                arrowNavigationItemsIds.push(id);
-            });
-        }
+        jsonSuggestions.persons.forEach(function (person) {
+            var personItem = createPersonItem(person.person);
+            var id = appendSuggestionItem(divPeopleElement, personItem);
+            arrowNavigationItemsIds.push(id);
+        });
     } else {
         setVisibility(divPeopleElement.parentElement, false);
     }
@@ -269,11 +265,86 @@ function createSuggestionsUI(searchText, suggestions) {
 }
 
 /**
+ * Creates a film item
+ *
+ * @param {any} json json object returned from kinopoisk API
+ *
+ * @returns {any}
+ */
+function createFilmItem(json) {
+    var imgLink = get(json, "poster.avatarsUrl");
+    if (imgLink) {
+        imgLink ="https:" + imgLink + "/40x60";
+    }
+    var year = get(json, "productionYear");
+    if (!year) {
+        year = get(json, "releaseYears");
+        if (year && Array.isArray(year) && year.length == 1) {
+            year = year[0].start + " &#8211; " + year[0].end;
+        }
+    }
+    var rating = get(json, "rating.kinopoisk.value");
+    if (rating) {
+        rating = rating.toFixed(1);
+    }
+    var link = get(json, "id");
+    if (link) {
+        link = "film/" + link;
+    }
+    var name = get(json, "title.russian");
+    var subname = get(json, "title.original");
+    var isSerial = get(json, "__typename") == "TvSeries";
+
+    return {
+        link: link ? link : null,
+        imgLink: imgLink ? imgLink : null,
+        name: name ? name : null,
+        subname: subname ? subname : null,
+        year: year ? year : null,
+        rating: rating ? rating : null,
+        isSerial: isSerial
+    };
+}
+
+/**
+ * Creates a person item
+ *
+ * @param {any} json json object returned from kinopoisk API
+ *
+ * @returns {any}
+ */
+function createPersonItem(json) {
+    var imgLink = get(json, "poster.avatarsUrl");
+    if (imgLink) {
+        imgLink ="https:" + imgLink + "/40x60";
+    }
+    var year = get(json, "birthDate");
+    if (year) {
+        year = (new Date(year).getFullYear());
+    }
+    var link = get(json, "id");
+    if (link) {
+        link = "name/" + link;
+    }
+    var name = get(json, "name");
+    var subname = get(json, "originalName");
+
+    return {
+        link: link ? link : null,
+        imgLink: imgLink ? imgLink : null,
+        name: name ? name : null,
+        subname: subname ? subname : null,
+        year: year ? year : null,
+        rating: null,
+        isSerial: false
+    };
+}
+
+/**
  * Creates and appends suggestion to html element
  *
- * @param {Element} element html element
+ * @param {HTMLElement} element html element
  * @param {any} item suggestion item
- * @param {string} id unique id of an item
  *
  * @returns {string} id of an element
  */
@@ -291,9 +362,9 @@ function appendSuggestionItem(element, item) {
     var divContentImage = document.createElement("div");
     divContentImage.className = "divSuggestionContentImage";
 
-    if (item.image) {
+    if (item.imgLink) {
         var img = document.createElement("img");
-        img.src = item.image;
+        img.src = item.imgLink;
         divContentImage.appendChild(img);
     } else {
         var img = document.createElement("div");
@@ -305,19 +376,25 @@ function appendSuggestionItem(element, item) {
     var divContentMain = document.createElement("div");
     divContentMain.className = "divSuggestionContentMain";
 
-    if (item.rus) {
+    if (item.name) {
         var divName = document.createElement("div");
         divName.className = "divSuggestionName";
-        divName.innerHTML = item.rus;
+        divName.innerHTML = item.name;
+        divContentMain.appendChild(divName);
+    } else if (item.subname) {
+        var divName = document.createElement("div");
+        divName.className = "divSuggestionName";
+        divName.innerHTML = item.subname;
         divContentMain.appendChild(divName);
     }
 
     var spanSubname = document.createElement("span");
     spanSubname.className = "spanSuggestionContentSubname";
-    if (item.name) {
-        spanSubname.innerHTML = item.name;
+
+    if (item.subname) {
+        spanSubname.innerHTML = item.subname;
     }
-    if (item.is_serial) {
+    if (item.isSerial) {
         if (spanSubname.innerHTML.length > 0) {
             spanSubname.innerHTML += ", ";
         }
@@ -336,25 +413,23 @@ function appendSuggestionItem(element, item) {
     a.appendChild(divContent);
 
     // rating
-    if (item.ur_rating != undefined) {
-        var divRating = document.createElement("div");
-        divRating.className = "divSuggestionItemRating";
+    var divRating = document.createElement("div");
+    divRating.className = "divSuggestionItemRating";
 
-        if (item.ur_rating != 0) {
-            divRating.innerHTML = item.ur_rating;
-            if (item.ur_rating < 5) {
-                divRating.classList.add("negativeRating");
-            } else if (item.ur_rating >= 7) {
-                divRating.classList.add("positiveRating");
-            } else {
-                divRating.classList.add("neutralRating");
-            }
+    if (item.rating) {
+        divRating.innerHTML = item.rating;
+        if (item.rating < 5) {
+            divRating.classList.add("negativeRating");
+        } else if (item.rating >= 7) {
+            divRating.classList.add("positiveRating");
         } else {
-            divRating.innerHTML = "&mdash;";
+            divRating.classList.add("neutralRating");
         }
-
-        a.appendChild(divRating);
+    } else {
+        divRating.innerHTML = "&mdash;";
     }
+
+    a.appendChild(divRating);
 
     // bookmark
     var divBookmark = document.createElement("div");
@@ -365,9 +440,10 @@ function appendSuggestionItem(element, item) {
     divBookmarkButton.className = "divSuggestionItemBookmarkButton";
     divBookmarkButton.title = chrome.i18n.getMessage("bookmarkButton");
     divBookmarkButton.addEventListener("click", function (event) {
-        var element = event.target;
         event.stopPropagation();
         event.preventDefault();
+
+        var element = event.target;
 
         var buttonCenterX = element.getBoundingClientRect().top + 18;
 
@@ -388,7 +464,8 @@ function appendSuggestionItem(element, item) {
         if (divBookmark.lastChild.id == "divSuggestionItemBookmarkDropdown") {
             divBookmark.removeChild(divBookmarkDroppdownContent);
         } else {
-            divBookmarkDroppdownContent.setAttribute("data-title", item.rus);
+            var title = item.name ? item.name : item.subname;
+            divBookmarkDroppdownContent.setAttribute("data-title", title);
             divBookmarkDroppdownContent.setAttribute("data-url", getKpItemUrl(item.link));
             divBookmark.appendChild(divBookmarkDroppdownContent);
         }
@@ -401,75 +478,4 @@ function appendSuggestionItem(element, item) {
     element.appendChild(a);
 
     return a.id;
-}
-
-/**
- * Sets element's visibility
- *
- * @param {Element} element id of an html element
- * @param {boolean} visiblity visibility
- */
-function setVisibility(element, visiblity) {
-    if (visiblity) {
-        element.removeAttribute("hidden");
-    } else {
-        element.setAttribute("hidden", true);
-    }
-}
-
-/**
- * Creates kinopoisk item url
- *
- * @param {string} itemUrl url on a kinopoisk item
- *
- * @returns {string}
- */
-function getKpItemUrl(itemUrl) {
-    return "https://www.kinopoisk.ru" + itemUrl;
-}
-
-/**
- * Creates kinopoisk search request url
- *
- * @param {string} searchText search request text
- *
- * @returns {string}
- */
-function getKpSearchUrl(searchText) {
-    return "https://www.kinopoisk.ru/index.php?kp_query=" + encodeURIComponent(searchText);
-}
-
-/**
- * Creates kinopoisk suggestions request url
- *
- * @param {string} searchText search request text
- *
- * @returns {string}
- */
-function getKpSearchSuggestionsUrl(searchText) {
-    return "https://www.kinopoisk.ru/handler_search.php?topsuggest=true&q=" + encodeURIComponent(searchText);
-}
-
-/**
- * Opens page in new tab
- *
- * @param {string} pageUrl url of a page
- */
-function openInNewTab(pageUrl) {
-    chrome.tabs.create({
-        url: pageUrl
-    });
-}
-
-/**
- * Generates unique id
- *
- * @returns {string}
- */
-function uuid() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0,
-            v = c == "x" ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
 }

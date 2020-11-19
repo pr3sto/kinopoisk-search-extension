@@ -1,11 +1,13 @@
-var id = chrome.contextMenus.create({
-    id: "kinopoiskSearch",
-    title: chrome.i18n.getMessage("extensionName"),
-    contexts: ["selection"]
+chrome.runtime.onInstalled.addListener(function () {
+    chrome.contextMenus.create({
+        id: "kinopoiskSearch",
+        title: chrome.i18n.getMessage("extensionName"),
+        contexts: ["selection"]
+    });
 });
 
 chrome.contextMenus.onClicked.addListener(function (clickData) {
-    if (clickData.menuItemId == id && clickData.selectionText) {
+    if (clickData.menuItemId == "kinopoiskSearch" && clickData.selectionText) {
         openInNewTab(getKpSearchUrl(clickData.selectionText));
     }
 });
@@ -14,6 +16,8 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
  * Creates kinopoisk search request url
  *
  * @param {string} searchText search request
+ *
+ * @returns {string}
  */
 function getKpSearchUrl(searchText) {
     return "https://www.kinopoisk.ru/index.php?kp_query=" + encodeURIComponent(searchText);
@@ -25,5 +29,7 @@ function getKpSearchUrl(searchText) {
  * @param {string} pageUrl url of a page
  */
 function openInNewTab(pageUrl) {
-    chrome.tabs.create({ url: pageUrl });
+    chrome.tabs.create({
+        url: pageUrl
+    });
 }

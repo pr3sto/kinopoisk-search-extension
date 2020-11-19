@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 requestSuggestions(searchInput.value)
             }, 200);
         } else {
+            clearTimeout(searchRequestTimeout);
             resetSuggestionsUI();
         }
     });

@@ -233,7 +233,10 @@
     if (!year) {
       year = get(json, "releaseYears");
       if (year && Array.isArray(year) && year.length == 1) {
-        year = year[0].start + " - " + year[0].end;
+        year =
+          (year[0].start ? year[0].start : "...") +
+          " - " +
+          (year[0].end ? year[0].end : "...");
       }
     }
     if (year) {
@@ -253,8 +256,9 @@
       imgUrl: imgUrl ? imgUrl : null,
       name: name ? name : subname,
       subname: subname ? subname : null,
-      rating: rating ? rating : null,
       avaliableOnline: avaliableOnline ? avaliableOnline : null,
+      rating: rating ? rating : null,
+      showRating: true,
     };
   }
 
@@ -290,6 +294,7 @@
       name: name ? name : subname,
       subname: subname ? subname : null,
       rating: null,
+      showRating: false,
     };
   }
 

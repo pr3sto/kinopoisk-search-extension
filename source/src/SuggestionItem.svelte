@@ -128,14 +128,16 @@
     </div>
   </div>
 
-  {#if item.rating && item.rating < 5}
-    <div class="rating rating--negative">{item.rating}</div>
-  {:else if item.rating && item.rating >= 7}
-    <div class="rating rating--positive">{item.rating}</div>
-  {:else}
-    <div class="rating rating--neutral">
-      {item.rating ? item.rating : String.fromCharCode(8212)}
-    </div>
+  {#if item.showRating}
+    {#if item.rating && item.rating < 5}
+      <div class="rating rating--negative">{item.rating}</div>
+    {:else if item.rating && item.rating >= 7}
+      <div class="rating rating--positive">{item.rating}</div>
+    {:else}
+      <div class="rating rating--neutral">
+        {item.rating ? item.rating : String.fromCharCode(8212)}
+      </div>
+    {/if}
   {/if}
 
   <BookmarkButton bookmarkTitle={item.name} bookmarkUrl={item.url} />

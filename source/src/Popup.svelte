@@ -245,6 +245,8 @@
 
     let name = get(json, "title.russian");
 
+    let avaliableOnline = get(json, "onlineViewOptions.isAvailableOnline");
+
     return {
       id: uuid(),
       url: url ? url : null,
@@ -252,6 +254,7 @@
       name: name ? name : subname,
       subname: subname ? subname : null,
       rating: rating ? rating : null,
+      avaliableOnline: avaliableOnline ? avaliableOnline : null,
     };
   }
 
@@ -415,31 +418,25 @@
   {#if firstItem}
     <div class="suggestions__section">
       <div class="suggestions__section__header">{firstSuggestionHeader}</div>
-      <div id="divFirstSuggestion">
-        <SuggestionItem item={firstItem} />
-      </div>
+      <SuggestionItem item={firstItem} />
     </div>
   {/if}
 
   {#if filmItems && filmItems.length}
     <div class="suggestions__section">
       <div class="suggestions__section__header">{filmSuggestionHeader}</div>
-      <div id="divFilmSuggestions">
-        {#each filmItems as item}
-          <SuggestionItem {item} />
-        {/each}
-      </div>
+      {#each filmItems as item}
+        <SuggestionItem {item} />
+      {/each}
     </div>
   {/if}
 
   {#if personItems && personItems.length}
     <div class="suggestions__section">
       <div class="suggestions__section__header">{peopleSuggestionHeader}</div>
-      <div id="divPeopleSuggestions">
-        {#each personItems as item}
-          <SuggestionItem {item} />
-        {/each}
-      </div>
+      {#each personItems as item}
+        <SuggestionItem {item} />
+      {/each}
     </div>
   {/if}
 

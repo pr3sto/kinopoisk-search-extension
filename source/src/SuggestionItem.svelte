@@ -18,14 +18,7 @@
     background: #f2f2f2;
   }
 
-  .content {
-    display: flex;
-    flex: 1;
-    white-space: nowrap;
-    max-width: 350px;
-  }
-
-  .content-online {
+  .content-online, .content {
     display: flex;
     position: relative;
     flex: 1;
@@ -48,18 +41,9 @@
     border-radius: 2px;
     margin-right: 15px;
     flex-shrink: 0;
-    overflow: hidden;
   }
 
-  .content__image > img {
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    object-fit: cover;
-  }
-
-  .content__image > span {
+  .content__image > img, span {
     width: 100%;
     height: 100%;
     top: 0;
@@ -87,7 +71,7 @@
   }
 
   .content__text__subname {
-    color: rgba(51, 51, 51, 0.4);
+    color: #aaa;
     font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -98,7 +82,6 @@
     color: #777;
     font-size: 13px;
     font-weight: 600;
-    width: 20px;
     text-align: right;
   }
 

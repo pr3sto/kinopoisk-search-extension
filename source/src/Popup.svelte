@@ -384,8 +384,7 @@
 
   #link-all-results::after {
     position: absolute;
-    top: 8px;
-    right: 10px;
+    right: 15px;
     content: "";
     width: 15px;
     height: 15px;

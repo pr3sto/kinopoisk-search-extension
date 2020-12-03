@@ -101,6 +101,7 @@
     opacity: 0.3;
     width: 20px;
     height: 36px;
+    transition: opacity 0.1s ease-out;
   }
 
   .bookmark__button:hover {
@@ -115,7 +116,7 @@
     max-height: 150px;
     overflow-y: scroll;
     box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
+    z-index: 100;
   }
 
   .bookmark__popup > span {
@@ -150,13 +151,13 @@
     class="bookmark__button"
     title={buttonTitle}
     on:click={(e) => showPopup(e)}
-    on:mouseleave={() => setPopupHideTimeout()} />
+    on:mouseleave={setPopupHideTimeout} />
   {#if isPopupVisible}
     <div
       class="bookmark__popup"
       style={popupStyle}
-      on:mouseenter={() => clearPopupHideTimeout()}
-      on:mouseleave={() => hidePopup()}>
+      on:mouseenter={clearPopupHideTimeout}
+      on:mouseleave={hidePopup}>
       {#each folders as folder}
         <span on:click={(e) => saveBookmark(e, folder)}><span
             class="bookmark__popup__icon" />{folder.title}</span>

@@ -71,6 +71,7 @@
   let personItems = [];
   let allResultsUrl = "";
 
+  let aborted = false;
   let searchRequestTimeout;
   let searchInput;
   let arrowNavigationItemsIds = [];
@@ -78,6 +79,7 @@
   function handleKeydown(event) {
     // arrow navigation
     if (isButtonUp(event) || isButtonDown(event)) {
+      event.preventDefault();
       if (arrowNavigationItemsIds.length > 1) {
         let position = arrowNavigationItemsIds.indexOf(event.target.id);
 
@@ -95,7 +97,6 @@
         }
       }
     }
-    event.preventDefault;
   }
 
   function openKinopoisk() {
@@ -114,21 +115,28 @@
   }
 
   function updateSuggestions() {
-    firstItem = null;
-    filmItems = [];
-    personItems = [];
-
     if (searchInput.value.length > 1) {
       if (searchRequestTimeout) {
         clearTimeout(searchRequestTimeout);
       }
       searchRequestTimeout = setTimeout(
-        requestSuggestions(searchInput.value),
-        200
+        requestSuggestions,
+        200,
+        searchInput.value
       );
+      aborted = false;
     } else {
       clearTimeout(searchRequestTimeout);
+      clearSuggestions();
+      aborted = true;
     }
+  }
+
+  function clearSuggestions() {
+    firstItem = null;
+    filmItems = [];
+    personItems = [];
+    allResultsUrl = "";
   }
 
   function requestSuggestions(searchText) {
@@ -145,6 +153,8 @@
   }
 
   function createSuggestions(searchText, jsonResponse) {
+    clearSuggestions();
+
     // incorrect json format or empty
     if (!jsonResponse || !jsonResponse.suggest || !jsonResponse.suggest.top) {
       return;
@@ -161,10 +171,6 @@
     }
 
     arrowNavigationItemsIds = ["inputs__searchbar"];
-
-    firstItem = null;
-    filmItems = [];
-    personItems = [];
 
     // first suggestion
     if (jsonSuggestions.topResult) {
@@ -202,6 +208,11 @@
     arrowNavigationItemsIds.push("link-all-results");
 
     allResultsUrl = getKpSearchUrl(searchText);
+
+    // operation aborted
+    if (aborted) {
+      clearSuggestions();
+    }
   }
 
   function createFilmItem(json) {

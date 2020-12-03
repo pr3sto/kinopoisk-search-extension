@@ -4,6 +4,8 @@
   export let bookmarkTitle;
   export let bookmarkUrl;
 
+  let bookmarkSaved = false;
+
   // timeout for hiding popup
   let popupHideTimeout;
 
@@ -67,6 +69,9 @@
       url: bookmarkUrl,
     });
 
+    bookmarkSaved = true;
+    setTimeout(function() { bookmarkSaved = false; }, 700);
+
     isPopupVisible = false;
   }
 
@@ -102,6 +107,23 @@
     width: 20px;
     height: 36px;
     transition: opacity 0.1s ease-out;
+  }
+
+  .bookmark__saved {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 330 330' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect x='-1' y='-1' width='802' height='602' fill='none'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath d='m265 0h-200c-8.284 0-15 6.716-15 15v300c0 5.766 3.305 11.022 8.502 13.52s11.365 1.796 15.868-1.807l90.63-72.503 90.63 72.503c2.712 2.17 6.027 3.287 9.372 3.287 2.208 0 4.43-0.487 6.496-1.48 5.197-2.497 8.502-7.753 8.502-13.52v-300c0-8.284-6.716-15-15-15z' fill='%23f60'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect x='-1' y='-1' width='332' height='332' fill='none'/%3E%3C/g%3E%3C/svg%3E%0A")
+      center no-repeat;
+    animation: scale 0.8s cubic-bezier(0.260, 0.860, 0.630, 1.000);
+    z-index: 101;
+  }
+
+  @keyframes scale {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
   }
 
   .bookmark__button:hover {
@@ -147,6 +169,7 @@
 </style>
 
 <div class="bookmark">
+  {#if bookmarkSaved}<div class="bookmark__saved"/>{/if}
   <div
     class="bookmark__button"
     title={buttonTitle}

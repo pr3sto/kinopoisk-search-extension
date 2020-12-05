@@ -114,7 +114,14 @@
     }
   }
 
-  function updateSuggestions() {
+  function clearSuggestions() {
+    firstItem = null;
+    filmItems = [];
+    personItems = [];
+    allResultsUrl = "";
+  }
+
+  function fillSuggestions() {
     if (searchInput.value.length > 1) {
       if (searchRequestTimeout) {
         clearTimeout(searchRequestTimeout);
@@ -130,13 +137,6 @@
       clearSuggestions();
       aborted = true;
     }
-  }
-
-  function clearSuggestions() {
-    firstItem = null;
-    filmItems = [];
-    personItems = [];
-    allResultsUrl = "";
   }
 
   function requestSuggestions(searchText) {
@@ -217,22 +217,19 @@
 
   function createFilmItem(json) {
     let url = get(json, "id");
-    if (url) {
-      url = "https://www.kinopoisk.ru/film/" + url;
-    }
+    url = url
+      ? "https://www.kinopoisk.ru/film/" + url
+      : "https://www.kinopoisk.ru/";
+
     let imgUrl = get(json, "poster.avatarsUrl");
-    if (imgUrl) {
-      imgUrl = "https:" + imgUrl + "/40x60";
-    }
+    imgUrl = imgUrl ? "https:" + imgUrl + "/40x60" : null;
+
     let rating = get(json, "rating.kinopoisk.value");
-    if (rating) {
-      rating = rating.toFixed(1);
-    }
+    rating = rating ? rating.toFixed(1) : null;
 
     let subname = get(json, "title.original");
-    if (!subname) {
-      subname = "";
-    }
+    subname = subname ? subname : "";
+
     let isSerial = get(json, "__typename") == "TvSeries";
     if (isSerial) {
       if (subname.length > 0) {
@@ -240,6 +237,7 @@
       }
       subname += chrome.i18n.getMessage("spanIsSerial");
     }
+
     let year = get(json, "productionYear");
     if (!year) {
       year = get(json, "releaseYears");
@@ -258,35 +256,35 @@
     }
 
     let name = get(json, "title.russian");
+    name = name ? name : subname;
 
     let avaliableOnline = get(json, "onlineViewOptions.isAvailableOnline");
+    avaliableOnline = avaliableOnline ? true : false;
 
     return {
       id: uuid(),
-      url: url ? url : null,
-      imgUrl: imgUrl ? imgUrl : null,
-      name: name ? name : subname,
-      subname: subname ? subname : null,
-      avaliableOnline: avaliableOnline ? avaliableOnline : null,
-      rating: rating ? rating : null,
+      url: url,
+      imgUrl: imgUrl,
+      name: name,
+      subname: subname,
+      avaliableOnline: avaliableOnline,
+      rating: rating,
       showRating: true,
     };
   }
 
   function createPersonItem(json) {
     let url = get(json, "id");
-    if (url) {
-      url = "https://www.kinopoisk.ru/name/" + url;
-    }
+    url = url
+      ? "https://www.kinopoisk.ru/name/" + url
+      : "https://www.kinopoisk.ru/";
+
     let imgUrl = get(json, "poster.avatarsUrl");
-    if (imgUrl) {
-      imgUrl = "https:" + imgUrl + "/40x60";
-    }
+    imgUrl = imgUrl ? "https:" + imgUrl + "/40x60" : null;
 
     let subname = get(json, "originalName");
-    if (!subname) {
-      subname = "";
-    }
+    subname = subname ? subname : "";
+
     let year = get(json, "birthDate");
     if (year) {
       year = new Date(year).getFullYear();
@@ -297,14 +295,14 @@
     }
 
     let name = get(json, "name");
+    name = name ? name : subname;
 
     return {
       id: uuid(),
-      url: url ? url : null,
-      imgUrl: imgUrl ? imgUrl : null,
-      name: name ? name : subname,
-      subname: subname ? subname : null,
-      rating: null,
+      url: url,
+      imgUrl: imgUrl,
+      name: name,
+      subname: subname,
       showRating: false,
     };
   }
@@ -424,7 +422,7 @@
     autocomplete="off"
     placeholder={searchPlaceholder}
     id="inputs__searchbar"
-    on:input={() => updateSuggestions()}
+    on:input={() => fillSuggestions()}
     on:keyup={(e) => inputKeyup(e)} />
   <input type="button" id="inputs__button" on:click={() => openKinopoisk()} />
 </div>
@@ -455,7 +453,7 @@
     </div>
   {/if}
 
-  {#if firstItem || (filmItems && filmItems.length) || (personItems && personItems.length)}
+  {#if allResultsUrl}
     <a
       id="link-all-results"
       href={allResultsUrl}

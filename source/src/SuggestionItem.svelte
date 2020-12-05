@@ -18,7 +18,8 @@
     background: #f2f2f2;
   }
 
-  .content-online, .content {
+  .content-online,
+  .content {
     display: flex;
     position: relative;
     flex: 1;
@@ -32,7 +33,8 @@
     height: 100%;
     content: "";
     opacity: 0.3;
-    background: url("data:image/svg+xml,%3Csvg width='21' height='19' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect fill='none' id='canvas_background' height='10.21916' width='7.65067' y='-1' x='-1'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath id='svg_1' fill-rule='evenodd' fill='%23000000' d='m12.873,0.54c0.816,0.007 1.61,0.093 2.37,0.272c1.213,0.286 2.28,0.786 3.165,1.486a6.537,6.537 0 0 1 2.099,2.838c0.432,1.13 0.55,2.345 0.355,3.617c-0.174,1.172 -0.6,2.337 -1.276,3.46c-1.003,1.68 -2.481,3.145 -4.266,4.26c-0.544,0.343 -1.122,0.657 -1.722,0.922l-0.014,0.007a0.207,0.207 0 0 1 -0.056,0.029a13.68,13.68 0 0 1 -3.353,1.015c-0.028,0.007 -0.062,0.007 -0.09,0.014l2.614,-13.503l2.76,0l-1.819,9.329c0.063,-0.036 0.119,-0.065 0.174,-0.1c1.457,-0.88 2.642,-2.052 3.416,-3.403c0.893,-1.558 1.102,-3.152 0.593,-4.489c-0.51,-1.33 -1.701,-2.302 -3.353,-2.73a7.747,7.747 0 0 0 -1.646,-0.23c-0.648,0 -1.317,0.072 -1.993,0.215l0.564,-2.916c0.502,-0.064 0.99,-0.093 1.478,-0.093zm-6.963,1.787l-1.182,5.99l2.462,0l0.657,-3.367l2.761,0l-2.635,13.49l-2.76,0.014l1.536,-7.878l-2.467,0l-0.834,4.224l-2.747,0l0.829,-4.225l-1.483,0l0,-2.257l1.926,0l1.175,-5.99l2.76,0l0.002,-0.001z'/%3E%3C/g%3E%3C/svg%3E") right no-repeat;
+    background: url("data:image/svg+xml,%3Csvg width='21' height='19' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect fill='none' id='canvas_background' height='10.21916' width='7.65067' y='-1' x='-1'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath id='svg_1' fill-rule='evenodd' fill='%23000000' d='m12.873,0.54c0.816,0.007 1.61,0.093 2.37,0.272c1.213,0.286 2.28,0.786 3.165,1.486a6.537,6.537 0 0 1 2.099,2.838c0.432,1.13 0.55,2.345 0.355,3.617c-0.174,1.172 -0.6,2.337 -1.276,3.46c-1.003,1.68 -2.481,3.145 -4.266,4.26c-0.544,0.343 -1.122,0.657 -1.722,0.922l-0.014,0.007a0.207,0.207 0 0 1 -0.056,0.029a13.68,13.68 0 0 1 -3.353,1.015c-0.028,0.007 -0.062,0.007 -0.09,0.014l2.614,-13.503l2.76,0l-1.819,9.329c0.063,-0.036 0.119,-0.065 0.174,-0.1c1.457,-0.88 2.642,-2.052 3.416,-3.403c0.893,-1.558 1.102,-3.152 0.593,-4.489c-0.51,-1.33 -1.701,-2.302 -3.353,-2.73a7.747,7.747 0 0 0 -1.646,-0.23c-0.648,0 -1.317,0.072 -1.993,0.215l0.564,-2.916c0.502,-0.064 0.99,-0.093 1.478,-0.093zm-6.963,1.787l-1.182,5.99l2.462,0l0.657,-3.367l2.761,0l-2.635,13.49l-2.76,0.014l1.536,-7.878l-2.467,0l-0.834,4.224l-2.747,0l0.829,-4.225l-1.483,0l0,-2.257l1.926,0l1.175,-5.99l2.76,0l0.002,-0.001z'/%3E%3C/g%3E%3C/svg%3E")
+      right no-repeat;
   }
 
   .content__image {
@@ -43,7 +45,8 @@
     flex-shrink: 0;
   }
 
-  .content__image > img, span {
+  .content__image > img,
+  span {
     width: 100%;
     height: 100%;
     top: 0;
@@ -99,7 +102,7 @@
 </style>
 
 <a id={item.id} href={item.url} target="_blank">
-  <div class="{item.avaliableOnline ? "content-online" : "content"}">
+  <div class={item.avaliableOnline ? 'content-online' : 'content'}>
     <div class="content__image">
       {#if item.imgUrl}
         <img src={item.imgUrl} alt={item.name} />
@@ -107,7 +110,7 @@
     </div>
     <div class="content__text">
       <div class="content__text__name">{item.name}</div>
-      <span class="content__text__subname">{item.subname}</span>
+      <div class="content__text__subname">{item.subname}</div>
     </div>
   </div>
 

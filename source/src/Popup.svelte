@@ -90,7 +90,7 @@
         if (
           isButtonDown(event) &&
           position != -1 &&
-          position < arrowNavigationItemsIds.length
+          position + 1 < arrowNavigationItemsIds.length
         ) {
           let id = arrowNavigationItemsIds[position + 1];
           document.getElementById(id).focus();

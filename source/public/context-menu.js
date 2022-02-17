@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(function () {
   chrome.contextMenus.create({
     id: "kinopoiskSearch",
-    title: chrome.i18n.getMessage("extensionName"),
+    title: "Kinopoisk Search",
     contexts: ["selection"]
   });
 });

@@ -1,6 +1,15 @@
 <script>
   import BookmarkButton from "./BookmarkButton.svelte";
   export let item = {};
+
+  function handleClickLink(event) {
+    // prevent click when text is selected
+    var selection = document.getSelection();
+      if (selection.type === "Range") {
+        event.preventDefault();
+        return false;
+      }
+  }
 </script>
 
 <style>
@@ -62,6 +71,8 @@
 
   .content__text {
     overflow: hidden;
+    cursor: auto;
+    user-select: text;
   }
 
   .content__text__name {
@@ -101,7 +112,13 @@
   }
 </style>
 
-<a id={item.id} href={item.url} target="_blank">
+<a
+  id={item.id}
+  href={item.url}
+  target="_blank"
+  draggable="false"
+  on:click={(e) => handleClickLink(e)}
+>
   <div class={item.avaliableOnline ? 'content-online' : 'content'}>
     <div class="content__image">
       {#if item.imgUrl}

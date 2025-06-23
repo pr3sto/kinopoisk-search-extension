@@ -1,4 +1,14 @@
-/source/node_modules/
-/source/public/build/
+# Logs
+logs
+*.log
+npm-debug.log*
 
+# Local
+node_modules
+dist
+*.local
+
+# Editor directories and files
+.vscode/*
 .DS_Store
+.vscode

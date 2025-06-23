@@ -1,0 +1,38 @@
+{
+  "extensionName": {
+    "message": "Kinopoisk Search"
+  },
+  "extensionDescription": {
+    "message": "Search movies, TV series, celebrities using kinopoisk.ru"
+  },
+  "searchPlaceholder": {
+    "message": "Search"
+  },
+  "searchIconTitle": {
+    "message": "Open on kinopoisk.ru"
+  },
+  "noSuggestionsFound": {
+    "message": "Nothing found matching your request"
+  },
+  "firstSuggestionHeader": {
+    "message": "Maybe you were looking for"
+  },
+  "movieSuggestionHeader": {
+    "message": "Movies and TV series"
+  },
+  "personSuggestionHeader": {
+    "message": "Celebrities"
+  },
+  "showAllMessage": {
+    "message": "Show all"
+  },
+  "IsSerialText": {
+    "message": "TV series"
+  },
+  "addBookmarkButtonTitle": {
+    "message": "Add to bookmarks"
+  },
+  "bookmarkedButtonTitle": {
+    "message": "Added to bookmarks"
+  }
+}

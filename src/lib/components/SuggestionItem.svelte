@@ -1,67 +1,125 @@
-<script>
-  import BookmarkButton from "./BookmarkButton.svelte";
-  export let item = {};
+<script lang="ts">
+  import type { MovieItem, PersonItem } from '../types/suggestions';
+  import BookmarkButton from './BookmarkButton.svelte';
 
-  function handleClickLink(event) {
+  interface Props {
+    item: MovieItem | PersonItem;
+  }
+
+  let { item }: Props = $props();
+
+  function handleLinkClick(event: MouseEvent) {
     // prevent click when text is selected
-    var selection = document.getSelection();
-      if (selection.type === "Range") {
-        event.preventDefault();
-        return false;
-      }
+    if (document.getSelection()?.type === 'Range') {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+  }
+
+  function getRatingTag(): string {
+    if (item.__typename !== 'MovieItem') {
+      return 'none';
+    } else if (item.rating && item.rating >= 7) {
+      return 'positive';
+    } else if (item.rating && item.rating < 5) {
+      return 'negative';
+    } else {
+      return 'neutral';
+    }
   }
 </script>
 
-<style>
+<a
+  id={item.id}
+  href={item.url}
+  target="_blank"
+  draggable="false"
+  data-navigation-item
+  onclick={handleLinkClick}>
+  <div
+    class={item.__typename === 'MovieItem' && item.viewOption
+      ? `content content-viewoption content-viewoption--${item.viewOption}`
+      : 'content'}>
+    <div class="content__image">
+      {#if item.imgUrl}
+        <img src={item.imgUrl} alt={item.name} />
+      {:else}<span class="content__image__placeholder"></span>{/if}
+    </div>
+    <div class="content__text">
+      <div class="content__text__name">
+        <span title={item.name}>{item.name}</span>
+      </div>
+      <div class="content__text__subname">
+        <span title={item.subname}>
+          {#if item.__typename === 'MovieItem'}
+            <span
+              class="content__text__subname__rating content__text__subname__rating--{getRatingTag()}">
+              {item.rating?.toFixed(1) ?? String.fromCharCode(8212)}
+            </span>
+          {/if}
+          {item.subname}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <BookmarkButton bookmarkTitle={item.name} bookmarkUrl={item.url} />
+</a>
+
+<style lang="scss">
+  @use '../styles/colors.scss' as *;
+
   a {
     display: flex;
     padding: 5px 15px;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     text-decoration: none;
     outline: none;
+    transition: background 0.1s ease-out;
+
+    &:hover,
+    &:focus-within {
+      background: $light-background-color;
+    }
   }
 
-  a:hover,
-  a:focus {
-    background: #f2f2f2;
-  }
-
-  .content-online,
   .content {
     display: flex;
-    position: relative;
     flex: 1;
     white-space: nowrap;
-    max-width: 350px;
+    overflow: hidden;
+    margin-right: 15px;
   }
 
-  .content-online:before {
-    pointer-events: none;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    content: "";
-    opacity: 0.3;
-    background: url("data:image/svg+xml,%3Csvg width='21' height='19' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect fill='none' id='canvas_background' height='10.21916' width='7.65067' y='-1' x='-1'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath id='svg_1' fill-rule='evenodd' fill='%23000000' d='m12.873,0.54c0.816,0.007 1.61,0.093 2.37,0.272c1.213,0.286 2.28,0.786 3.165,1.486a6.537,6.537 0 0 1 2.099,2.838c0.432,1.13 0.55,2.345 0.355,3.617c-0.174,1.172 -0.6,2.337 -1.276,3.46c-1.003,1.68 -2.481,3.145 -4.266,4.26c-0.544,0.343 -1.122,0.657 -1.722,0.922l-0.014,0.007a0.207,0.207 0 0 1 -0.056,0.029a13.68,13.68 0 0 1 -3.353,1.015c-0.028,0.007 -0.062,0.007 -0.09,0.014l2.614,-13.503l2.76,0l-1.819,9.329c0.063,-0.036 0.119,-0.065 0.174,-0.1c1.457,-0.88 2.642,-2.052 3.416,-3.403c0.893,-1.558 1.102,-3.152 0.593,-4.489c-0.51,-1.33 -1.701,-2.302 -3.353,-2.73a7.747,7.747 0 0 0 -1.646,-0.23c-0.648,0 -1.317,0.072 -1.993,0.215l0.564,-2.916c0.502,-0.064 0.99,-0.093 1.478,-0.093zm-6.963,1.787l-1.182,5.99l2.462,0l0.657,-3.367l2.761,0l-2.635,13.49l-2.76,0.014l1.536,-7.878l-2.467,0l-0.834,4.224l-2.747,0l0.829,-4.225l-1.483,0l0,-2.257l1.926,0l1.175,-5.99l2.76,0l0.002,-0.001z'/%3E%3C/g%3E%3C/svg%3E")
-      right no-repeat;
+  .content-viewoption {
+    &--basic-kinopoisk {
+      background: url("data:image/svg+xml,%3csvg opacity='0.7' width='20' height='20' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath fill='%23fff' d='M0 0h20v20H0z'/%3e%3cpath fill='url(%23a)' d='M0 0h20v20H0z'/%3e%3cpath fill='url(%23b)' d='M0 0h20v20H0z'/%3e%3cpath fill-rule='evenodd' clip-rule='evenodd' d='m10.52 13.9 1.268-3.9H16.5a6.5 6.5 0 1 1-4.492-6.183l-1.48 4.558H6.202L5.673 10H10l-1.268 3.9h1.788Zm1.795-5.525 1.24-3.815a6.507 6.507 0 0 1 2.74 3.815h-3.98Z' fill='%23fff'/%3e%3cdefs%3e%3clinearGradient id='a' x1='0' y1='10' x2='20' y2='10' gradientUnits='userSpaceOnUse'%3e%3cstop stop-color='%23FF5C4D'/%3e%3cstop offset='.266' stop-color='%23EB469F'/%3e%3cstop offset='.75' stop-color='%238341EF'/%3e%3cstop offset='1' stop-color='%233F68F9'/%3e%3c/linearGradient%3e%3clinearGradient id='b' x1='0' y1='8.667' x2='20' y2='8.667' gradientUnits='userSpaceOnUse'%3e%3cstop stop-color='%23FF5C4D'/%3e%3cstop offset='.4' stop-color='%23EB469F'/%3e%3cstop offset='1' stop-color='%238341EF'/%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e")
+        right no-repeat;
+    }
+
+    &--kp-amediateka {
+      background: url("data:image/svg+xml,%3csvg opacity='0.7' width='40' height='20' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cg clip-path='url(%23a)'%3e%3cpath d='M20 0H0v20h20V0z' fill='url(%23b)'/%3e%3cmask id='c' style='mask-type:luminance' maskUnits='userSpaceOnUse' x='3' y='3' width='14' height='14'%3e%3cpath d='M16.5 10a6.5 6.5 0 1 0-13 0 6.5 6.5 0 0 0 13 0z' fill='%23fff'/%3e%3c/mask%3e%3cg mask='url(%23c)'%3e%3cpath fill-rule='evenodd' clip-rule='evenodd' d='M16.5 3.5h-13v13h13V10h-4.712l-1.268 3.9H8.733L10 10H5.673l.529-1.625h4.326L12.113 3.5H13.9l-1.584 4.875H16.5V3.5z' fill='%23fff'/%3e%3c/g%3e%3cpath d='M40 0H20v20h20V0z' fill='%23222'/%3e%3cpath fill-rule='evenodd' clip-rule='evenodd' d='M28.605 13.86h5.237l.816 1.578h2.553L31.237 3.504l-5.974 11.934h2.54l.802-1.579zm4.198-2.053h-3.171l1.579-3.171 1.592 3.17zm-3.277-7.5-5.565 11.131h.513L29.776 4.82l-.25-.513zm-1.684.802-5.158 10.33h.514l4.907-9.803-.263-.527z' fill='%23fff'/%3e%3c/g%3e%3cdefs%3e%3clinearGradient id='b' x1='0' y1='8.667' x2='20' y2='8.667' gradientUnits='userSpaceOnUse'%3e%3cstop stop-color='%23FF5C4D'/%3e%3cstop offset='.4' stop-color='%23EB469F'/%3e%3cstop offset='1' stop-color='%238341EF'/%3e%3c/linearGradient%3e%3cclipPath id='a'%3e%3cpath fill='%23fff' d='M0 0h40v20H0z'/%3e%3c/clipPath%3e%3c/defs%3e%3c/svg%3e")
+        right no-repeat;
+    }
+
+    &--kp-start {
+      background: url("data:image/svg+xml,%3Csvg opacity='0.7' width='40' height='20' viewBox='0 0 80 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath transform='translate(0 .007)' fill='url(%23a)' d='M0 0h40v40H0z'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M20 7.007c-7.18 0-13 5.82-13 13s5.82 13 13 13 13-5.82 13-13h-9.425l-2.535 7.8h-3.575l2.535-7.8h-8.653l1.057-3.25h8.652L24.02 7.64A12.99 12.99 0 0 0 20 7.007Zm7.113 2.116-2.482 7.634h7.96a13.021 13.021 0 0 0-5.479-7.634Z' fill='%23fff'/%3E%3Cpath fill='%231F1F1F' d='M40 .007h40v40H40z'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M60 7c-7.18 0-13 5.82-13 13s5.82 13 13 13 13-5.82 13-13S67.18 7 60 7Zm3.8 11.782c.734.016 1.377.067 1.933.152 2.078.321 2.953 1.145 2.953 2.597v.174c0 1.204-.479 2.431-2.953 2.899-.668.126-1.48.197-2.468.197h-.858c-.956 0-1.745-.081-2.396-.22v.22h-.497c-3.573 0-4.816-1.134-5.224-2.219v1.984c-2.598-.58-2.953-2.103-2.953-3.074v-.137h5.791c.037.547.361 1.467 2.748 1.467h.076v-1.467h.068c.037.547.361 1.467 2.748 1.467h.174c2.437 0 2.71-.485 2.71-.982 0-.535-.285-.882-2.424-.932l-1.592-.038a11.483 11.483 0 0 1-1.624-.15v.18l-1.269-.029c-2.994-.085-4.187-.973-4.453-2.148v1.988c-2.127-.381-2.829-1.375-2.829-2.55v-.112c0-1.093.524-2.225 2.83-2.649v2.05c.251-1.168 1.38-2.223 4.975-2.223h.746v.162a12.551 12.551 0 0 1 2.147-.162h.858c1.11 0 2.003.098 2.717.268 2.1.5 2.654 1.615 2.654 2.654v.124H65.38c-.05-.36-.261-1.107-2.673-1.107h-.2c-2.238 0-2.4.41-2.4.796 0 .385.237.772 2.14.796l1.554.024Zm-4.448-.024.6.01v-1.6c-.046-.002-.091-.002-.14-.002h-.198c-2.239 0-2.4.41-2.4.796 0 .385.236.772 2.138.796Z' fill='%23fff'/%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='17.333' x2='40' y2='17.333' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FF5C4D'/%3E%3Cstop offset='.4' stop-color='%23EB469F'/%3E%3Cstop offset='1' stop-color='%238341EF'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E")
+        right no-repeat;
+    }
   }
 
   .content__image {
+    flex-shrink: 0;
+    margin-right: 15px;
     width: 24px;
     height: 36px;
-    border-radius: 2px;
-    margin-right: 15px;
-    flex-shrink: 0;
-  }
 
-  .content__image > img,
-  span {
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    object-fit: cover;
+    & > img,
+    span {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .content__image__placeholder {
@@ -71,78 +129,54 @@
   }
 
   .content__text {
-    overflow: hidden;
-    cursor: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     user-select: text;
+    overflow: hidden;
   }
 
   .content__text__name {
-    color: #333;
+    color: $dark-font-color;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    & span {
+      cursor: auto;
+    }
   }
 
   .content__text__subname {
-    color: #aaa;
+    color: $light-font-color;
     font-size: 12px;
+    line-height: 15px;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    & span {
+      cursor: auto;
+    }
   }
 
-  .rating {
-    padding: 0 10px 0 10px;
-    color: #777;
+  .content__text__subname__rating {
     font-size: 13px;
-    font-weight: 600;
-    text-align: right;
-  }
 
-  .rating--positive {
-    color: #093;
-  }
+    &--positive {
+      color: $rating-positive-color;
+      font-weight: 600;
+    }
 
-  .rating--negative {
-    color: #ff0b0b;
-  }
+    &--negative {
+      color: $rating-negative-color;
+      font-weight: 600;
+    }
 
-  .rating--neutral {
-    color: #777;
+    &--neutral {
+      color: $rating-neutral-color;
+      font-weight: 600;
+    }
   }
 </style>
-
-<a
-  id={item.id}
-  href={item.url}
-  target="_blank"
-  draggable="false"
-  on:click={(e) => handleClickLink(e)}
->
-  <div class={item.avaliableOnline ? 'content-online' : 'content'}>
-    <div class="content__image">
-      {#if item.imgUrl}
-        <img src={item.imgUrl} alt={item.name} />
-      {:else}<span class="content__image__placeholder" />{/if}
-    </div>
-    <div class="content__text">
-      <div class="content__text__name">{item.name}</div>
-      <div class="content__text__subname">{item.subname}</div>
-    </div>
-  </div>
-
-  {#if item.showRating}
-    {#if item.rating && item.rating < 5}
-      <div class="rating rating--negative">{item.rating}</div>
-    {:else if item.rating && item.rating >= 7}
-      <div class="rating rating--positive">{item.rating}</div>
-    {:else}
-      <div class="rating rating--neutral">
-        {item.rating ? item.rating : String.fromCharCode(8212)}
-      </div>
-    {/if}
-  {/if}
-
-  <BookmarkButton bookmarkTitle={item.name} bookmarkUrl={item.url} />
-</a>

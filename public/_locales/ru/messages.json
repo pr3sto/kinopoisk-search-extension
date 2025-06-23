@@ -1,0 +1,38 @@
+{
+  "extensionName": {
+    "message": "Kinopoisk Search"
+  },
+  "extensionDescription": {
+    "message": "Поиск фильмов, сериалов, персон на kinopoisk.ru"
+  },
+  "searchPlaceholder": {
+    "message": "Поиск"
+  },
+  "searchIconTitle": {
+    "message": "Открыть на kinopoisk.ru"
+  },
+  "noSuggestionsFound": {
+    "message": "По вашему запросу ничего не найдено"
+  },
+  "firstSuggestionHeader": {
+    "message": "Возможно, вы искали"
+  },
+  "movieSuggestionHeader": {
+    "message": "Фильмы и сериалы"
+  },
+  "personSuggestionHeader": {
+    "message": "Персоны"
+  },
+  "showAllMessage": {
+    "message": "Показать все"
+  },
+  "IsSerialText": {
+    "message": "сериал"
+  },
+  "addBookmarkButtonTitle": {
+    "message": "Добавить в закладки"
+  },
+  "bookmarkedButtonTitle": {
+    "message": "Добавлен в закладки"
+  }
+}

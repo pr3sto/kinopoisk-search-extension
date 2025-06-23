@@ -1,0 +1,29 @@
+{
+  "name": "kinopoisk-search-extension",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "svelte:check": "svelte-check --tsconfig ./tsconfig.json",
+    "prettier:check": "prettier --check '{src,tests}/**/*.{js,ts,scss,svelte}'",
+    "prettier:format": "prettier --write '{src,tests}/**/*.{js,ts,scss,svelte}'"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
+    "@tsconfig/svelte": "^5.0.2",
+    "@types/chrome": "^0.0.326",
+    "autoprefixer": "^10.4.18",
+    "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-svelte": "^3.4.0",
+    "sass-embedded": "^1.89.2",
+    "svelte": "^5.0.0-next.68",
+    "svelte-check": "^3.6.4",
+    "tslib": "^2.7.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4"
+  }
+}

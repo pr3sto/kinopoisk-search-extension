@@ -30,7 +30,6 @@
 </script>
 
 <a
-  id={item.id}
   href={item.url}
   target="_blank"
   draggable="false"
@@ -53,7 +52,7 @@
         <span title={item.subname}>
           {#if item.__typename === 'MovieItem'}
             <span
-              class="content__text__subname__rating content__text__subname__rating--{getRatingTag()}">
+              class="content__text__rating content__text__rating--{getRatingTag()}">
               {item.rating?.toFixed(1) ?? String.fromCharCode(8212)}
             </span>
           {/if}
@@ -161,7 +160,7 @@
     }
   }
 
-  .content__text__subname__rating {
+  .content__text__rating {
     font-size: 13px;
 
     &--positive {

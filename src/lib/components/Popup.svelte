@@ -158,7 +158,7 @@
     onclick={handleSearchbarButtonClick}></button>
 </div>
 
-<div id="suggestions" style={suggestionsLoading ? 'min-height:100px;' : ''}>
+<div id="suggestions" style:min-height={suggestionsLoading ? '100px' : '0px'}>
   {#if suggestionsLoading}
     <div id="suggestions__loader">
       <span id="suggestions__loader__spinner"></span>

@@ -1,4 +1,4 @@
 # kinopoisk-search-extension
-Browser extension for fast access to Kinopoisk.ru search
+Chrome extension for quick access to the search bar on kinopoisk.ru
 
-[<img src="chrome.png">](https://chrome.google.com/webstore/detail/kinopoisk-search/inpnclbkkfdkjnnnijmcjmoddimecdfn)
+[<img src="cws.png">](https://chrome.google.com/webstore/detail/kinopoisk-search/inpnclbkkfdkjnnnijmcjmoddimecdfn)

@@ -5,6 +5,9 @@
   "extensionDescription": {
     "message": "Поиск фильмов, сериалов, персон на kinopoisk.ru"
   },
+  "contextMenuTitle": {
+    "message": "Искать \"%s\" на kinopoisk.ru"
+  },
   "searchPlaceholder": {
     "message": "Поиск"
   },

@@ -5,7 +5,7 @@ const contextMenuId = 'kinopoiskSearch';
 chrome.runtime.onInstalled.addListener(function () {
   chrome.contextMenus.create({
     id: contextMenuId,
-    title: chrome.i18n.getMessage('extensionName'),
+    title: chrome.i18n.getMessage('contextMenuTitle'),
     contexts: ['selection'],
   });
 });

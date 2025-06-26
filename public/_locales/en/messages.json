@@ -3,7 +3,10 @@
     "message": "Kinopoisk Search"
   },
   "extensionDescription": {
-    "message": "Search movies, TV series, celebrities using kinopoisk.ru"
+    "message": "Search movies, TV series, celebrities on kinopoisk.ru"
+  },
+  "contextMenuTitle": {
+    "message": "Search \"%s\" on kinopoisk.ru"
   },
   "searchPlaceholder": {
     "message": "Search"

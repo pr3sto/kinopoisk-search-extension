@@ -67,10 +67,11 @@
 
 <style lang="scss">
   @use '../styles/colors.scss' as *;
+  @use '../styles/dimensions.scss' as *;
 
   a {
     display: flex;
-    padding: 5px 15px;
+    padding: $spacing-vertical-sm $spacing-horizontal-lg;
     justify-content: space-between;
     align-items: stretch;
     text-decoration: none;
@@ -79,7 +80,7 @@
 
     &:hover,
     &:focus-within {
-      background: $light-background-color;
+      background: $background-color-light;
     }
   }
 
@@ -88,7 +89,7 @@
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
-    margin-right: 15px;
+    margin-right: $spacing-horizontal-lg;
   }
 
   .content-viewoption {
@@ -110,9 +111,9 @@
 
   .content__image {
     flex-shrink: 0;
-    margin-right: 15px;
-    width: 24px;
-    height: 36px;
+    margin-right: $spacing-horizontal-lg;
+    width: $image-width;
+    height: $image-height;
 
     & > img,
     span {
@@ -131,15 +132,15 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    max-height: $image-height;
     user-select: text;
     overflow: hidden;
   }
 
   .content__text__name {
-    color: $dark-font-color;
-    font-size: 15px;
+    color: $font-color-dark;
+    font-size: $font-size-primary;
     font-weight: 600;
-    line-height: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
 
@@ -149,9 +150,8 @@
   }
 
   .content__text__subname {
-    color: $light-font-color;
-    font-size: 12px;
-    line-height: 15px;
+    color: $font-color-light;
+    font-size: $font-size-small;
     overflow: hidden;
     text-overflow: ellipsis;
 
@@ -161,20 +161,20 @@
   }
 
   .content__text__rating {
-    font-size: 13px;
+    font-size: $font-size-secondary;
 
     &--positive {
-      color: $rating-positive-color;
+      color: $rating-color-positive;
       font-weight: 600;
     }
 
     &--negative {
-      color: $rating-negative-color;
+      color: $rating-color-negative;
       font-weight: 600;
     }
 
     &--neutral {
-      color: $rating-neutral-color;
+      color: $rating-color-neutral;
       font-weight: 600;
     }
   }

@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { bookmarksState } from '../states/bookmarks.svelte';
+  import bookmarksState from '../states/bookmarks.svelte';
   import type { BookmarkFolder } from '../types/bookmark-folder';
   import { isButtonEsc } from '../utils/buttons';
+  import FoldersTreeView from './TreeView/FoldersTreeView.svelte';
 
   interface Props {
     bookmarkTitle: string;
@@ -49,12 +50,13 @@
     }
 
     const buttonRect = (event.target as HTMLElement).getBoundingClientRect();
-    const buttonCenterX = buttonRect.top + buttonRect.height / 2;
 
     // popup position
-    if (buttonCenterX + 200 > document.body.clientHeight) {
+    if (buttonRect.top + 200 > document.body.clientHeight) {
       popupStyle =
-        buttonCenterX < 200 ? `bottom:${buttonCenterX - 190}px;` : 'bottom:0;';
+        buttonRect.top < 200
+          ? `bottom:${buttonRect.top - 190}px;`
+          : 'bottom:0;';
     } else {
       popupStyle = 'top:0;';
     }
@@ -85,21 +87,20 @@
     }
   }
 
-  function handleBookmarkFolderClick(
-    event: MouseEvent,
-    folder: BookmarkFolder,
-  ) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    chrome.bookmarks.create({
-      parentId: folder.id,
-      title: bookmarkTitle,
-      url: bookmarkUrl,
-    });
-
-    bookmarksState.urls.push(bookmarkUrl);
-    showBookmarkedAnimation = true;
+  function createBookmark(folder: BookmarkFolder) {
+    chrome.bookmarks.create(
+      {
+        parentId: folder.id,
+        title: bookmarkTitle,
+        url: bookmarkUrl,
+      },
+      (node) => {
+        if (node.url) {
+          bookmarksState.urls.push(node.url);
+          showBookmarkedAnimation = true;
+        }
+      },
+    );
 
     hidePopup();
   }
@@ -109,7 +110,7 @@
   }
 </script>
 
-{#if bookmarksState.folders.length}
+{#if bookmarksState.rootFolder !== null}
   <div
     bind:this={bookmarkElement}
     class="bookmark"
@@ -140,18 +141,10 @@
         tabindex="-1"
         onmouseenter={handlePopupMouseEnter}
         onmouseleave={handlePopupMouseLeave}>
-        {#each bookmarksState.folders as folder}
-          <button
-            class="bookmark__popup__folder"
-            title={folder.title}
-            data-navigation-item
-            onclick={(e) => handleBookmarkFolderClick(e, folder)}>
-            <span>
-              <span class="bookmark__popup__folder__icon"></span>
-              {folder.title}
-            </span>
-          </button>
-        {/each}
+        <FoldersTreeView
+          isRoot={true}
+          folders={bookmarksState.rootFolder.children}
+          folderClickCallback={createBookmark} />
       </div>
     {/if}
   </div>
@@ -159,16 +152,20 @@
 
 <style lang="scss">
   @use '../styles/colors.scss' as *;
+  @use '../styles/dimensions.scss' as *;
+
+  $bookmark-popup-width: 200px;
+  $bookmark-popup-height: 200px;
 
   .bookmark {
     position: relative;
   }
 
   .bookmark__button {
-    width: 20px;
+    width: $icon-width-regular;
     height: 100%;
     border: none;
-    background: $light-font-color;
+    background: $font-color-light;
     mask: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 330 330' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect x='-1' y='-1' width='802' height='602' fill='none'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath d='m265 0h-200c-8.284 0-15 6.716-15 15v300c0 5.766 3.305 11.022 8.502 13.52s11.365 1.796 15.868-1.807l90.63-72.503 90.63 72.503c2.712 2.17 6.027 3.287 9.372 3.287 2.208 0 4.43-0.487 6.496-1.48 5.197-2.497 8.502-7.753 8.502-13.52v-300c0-8.284-6.716-15-15-15zm-15 283.79-75.63-60.503c-2.739-2.191-6.055-3.287-9.37-3.287s-6.631 1.096-9.37 3.287l-75.63 60.503v-253.79h170v253.79z'/%3E%3C/g%3E%3C/svg%3E%0A")
       center no-repeat;
     transition: background 0.1s ease-out;
@@ -214,49 +211,13 @@
 
   .bookmark__popup {
     position: absolute;
-    right: 30px;
-    max-width: 200px;
-    max-height: 200px;
-    background-color: $base-background-color;
-    border-radius: 7px;
+    right: 150%;
+    max-width: $bookmark-popup-width;
+    max-height: $bookmark-popup-height;
+    background-color: $background-color-base;
+    border-radius: $border-radius;
     box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.2);
     overflow-y: scroll;
     z-index: 1;
-  }
-
-  .bookmark__popup__folder {
-    display: flex;
-    width: 100%;
-    background: $base-background-color;
-    border: none;
-    outline: none;
-    text-align: start;
-    transition: background 0.1s ease-out;
-    cursor: pointer;
-
-    &:hover,
-    &:focus-within {
-      background: $light-background-color;
-    }
-
-    & > span {
-      padding: 5px 10px;
-      font-size: 15px;
-      color: $dark-font-color;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  }
-
-  .bookmark__popup__folder__icon {
-    display: inline-block;
-    vertical-align: text-bottom;
-    margin-right: 5px;
-    width: 20px;
-    height: 1em;
-    background: $light-font-color;
-    mask: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 445.96 445.96' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect x='-1' y='-1' width='802' height='602' fill='none'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath d='m336.06 173.98h-141.67l-10.324-70.317c-2.397-16.325-17.858-29.682-34.358-29.682h-123.75c-16.5 0-28.039 13.357-25.642 29.682l39.392 268.32h367.5l-35.047-168.63c-3.358-16.155-19.605-29.372-36.105-29.372z'/%3E%3Cpath d='m420.35 103.98h-205.92l5.872 39.999h115.75c14.855 0 29.74 5.454 41.913 15.357s20.541 23.367 23.564 37.911l19.05 91.658 25.002-155.31c2.623-16.29-8.731-29.619-25.231-29.619z'/%3E%3C/g%3E%3C/svg%3E%0A")
-      center no-repeat;
   }
 </style>

@@ -1,47 +1,49 @@
 import type { BookmarkFolder } from '../types/bookmark-folder';
 
-export const bookmarksState = $state<{
-  folders: BookmarkFolder[];
+const bookmarksState = $state<{
+  rootFolder: BookmarkFolder | null;
   urls: string[];
 }>({
-  folders: [],
+  rootFolder: null,
   urls: [],
 });
 
 function loadBookmarks(bookmarkNode: chrome.bookmarks.BookmarkTreeNode): {
-  folders: BookmarkFolder[];
+  folder: BookmarkFolder | null;
   urls: string[];
 } {
-  const folders: BookmarkFolder[] = [];
   const urls: string[] = [];
 
   // add bookmark url
   if (bookmarkNode.url) {
     // remove '/' at the end
     urls.push(bookmarkNode.url.replace(/\/+$/, ''));
-    return { folders, urls };
+    return { folder: null, urls };
   }
 
-  // add current folder if it is not a root folder
-  if (bookmarkNode.id != '0') {
-    folders.push({
-      id: bookmarkNode.id,
-      title: bookmarkNode.title,
-    });
-  }
+  let folder: BookmarkFolder = {
+    id: bookmarkNode.id,
+    title: bookmarkNode.title,
+    syncing: bookmarkNode.syncing,
+    children: [],
+  };
 
-  // search folders recursively
+  // search children recursively
   bookmarkNode.children?.forEach((node) => {
-    const { folders: childFolders, urls: childUrls } = loadBookmarks(node);
-    folders.push(...childFolders);
-    urls.push(...childUrls);
+    const { folder: f, urls: u } = loadBookmarks(node);
+    if (f !== null) {
+      folder.children.push(f);
+    }
+    urls.push(...u);
   });
 
-  return { folders, urls };
+  return { folder, urls };
 }
 
 chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
-  const { folders, urls } = loadBookmarks(bookmarkTreeNodes[0]);
-  bookmarksState.folders = folders;
+  const { folder, urls } = loadBookmarks(bookmarkTreeNodes[0]);
+  bookmarksState.rootFolder = folder;
   bookmarksState.urls = urls;
 });
+
+export default bookmarksState;

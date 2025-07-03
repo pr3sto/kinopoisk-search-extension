@@ -1,3 +1,4 @@
+import browser from 'webextension-polyfill';
 import type { BookmarkFolder } from '../types/bookmark-folder';
 
 const bookmarksState = $state<{
@@ -8,7 +9,7 @@ const bookmarksState = $state<{
   urls: [],
 });
 
-function loadBookmarks(bookmarkNode: chrome.bookmarks.BookmarkTreeNode): {
+function loadBookmarks(bookmarkNode: browser.Bookmarks.BookmarkTreeNode): {
   folder: BookmarkFolder | null;
   urls: string[];
 } {
@@ -24,7 +25,6 @@ function loadBookmarks(bookmarkNode: chrome.bookmarks.BookmarkTreeNode): {
   let folder: BookmarkFolder = {
     id: bookmarkNode.id,
     title: bookmarkNode.title,
-    syncing: bookmarkNode.syncing,
     children: [],
   };
 
@@ -40,7 +40,7 @@ function loadBookmarks(bookmarkNode: chrome.bookmarks.BookmarkTreeNode): {
   return { folder, urls };
 }
 
-chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
+browser.bookmarks.getTree().then((bookmarkTreeNodes) => {
   const { folder, urls } = loadBookmarks(bookmarkTreeNodes[0]);
   bookmarksState.rootFolder = folder;
   bookmarksState.urls = urls;

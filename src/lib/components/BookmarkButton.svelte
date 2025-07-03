@@ -1,4 +1,5 @@
 <script lang="ts">
+  import browser from 'webextension-polyfill';
   import bookmarksState from '../states/bookmarks.svelte';
   import type { BookmarkFolder } from '../types/bookmark-folder';
   import { isButtonEsc } from '../utils/buttons';
@@ -12,10 +13,10 @@
   let { bookmarkTitle, bookmarkUrl }: Props = $props();
 
   // localization
-  const i18n_addBookmarkButtonTitle = chrome.i18n.getMessage(
+  const i18n_addBookmarkButtonTitle = browser.i18n.getMessage(
     'addBookmarkButtonTitle',
   );
-  const i18n_bookmarkedButtonTitle = chrome.i18n.getMessage(
+  const i18n_bookmarkedButtonTitle = browser.i18n.getMessage(
     'bookmarkedButtonTitle',
   );
 
@@ -88,19 +89,18 @@
   }
 
   function createBookmark(folder: BookmarkFolder) {
-    chrome.bookmarks.create(
-      {
+    browser.bookmarks
+      .create({
         parentId: folder.id,
         title: bookmarkTitle,
         url: bookmarkUrl,
-      },
-      (node) => {
+      })
+      .then((node) => {
         if (node.url) {
           bookmarksState.urls.push(node.url);
           showBookmarkedAnimation = true;
         }
-      },
-    );
+      });
 
     hidePopup();
   }

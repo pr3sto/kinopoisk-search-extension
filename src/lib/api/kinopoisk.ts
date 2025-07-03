@@ -1,3 +1,4 @@
+import browser from 'webextension-polyfill';
 import type { MovieItem, PersonItem, Suggestions } from '../types/suggestions';
 import type {
   Movie,
@@ -92,7 +93,7 @@ function parseMovie(movie: Movie | TvSeries): MovieItem {
     if (subname.length > 0) {
       subname += ', ';
     }
-    subname += chrome.i18n.getMessage('IsSerialText');
+    subname += browser.i18n.getMessage('IsSerialText');
 
     if (movie.releaseYears.length === 1) {
       const start = movie.releaseYears[0].start ?? '...';

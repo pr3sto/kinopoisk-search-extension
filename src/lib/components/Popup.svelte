@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import browser from 'webextension-polyfill';
   import {
     getKpChanceUrl,
     getKpSearchUrl,
@@ -11,19 +12,19 @@
   import SuggestionItem from './SuggestionItem.svelte';
 
   // localization
-  const i18n_searchPlaceholder = chrome.i18n.getMessage('searchPlaceholder');
-  const i18n_searchIconTitle = chrome.i18n.getMessage('searchIconTitle');
-  const i18n_noSuggestionsFound = chrome.i18n.getMessage('noSuggestionsFound');
-  const i18n_firstSuggestionHeader = chrome.i18n.getMessage(
+  const i18n_searchPlaceholder = browser.i18n.getMessage('searchPlaceholder');
+  const i18n_searchIconTitle = browser.i18n.getMessage('searchIconTitle');
+  const i18n_noSuggestionsFound = browser.i18n.getMessage('noSuggestionsFound');
+  const i18n_firstSuggestionHeader = browser.i18n.getMessage(
     'firstSuggestionHeader',
   );
-  const i18n_movieSuggestionHeader = chrome.i18n.getMessage(
+  const i18n_movieSuggestionHeader = browser.i18n.getMessage(
     'movieSuggestionHeader',
   );
-  const i18n_personSuggestionHeader = chrome.i18n.getMessage(
+  const i18n_personSuggestionHeader = browser.i18n.getMessage(
     'personSuggestionHeader',
   );
-  const i18n_showAllMessage = chrome.i18n.getMessage('showAllMessage');
+  const i18n_showAllMessage = browser.i18n.getMessage('showAllMessage');
 
   let searchInput: HTMLInputElement;
   let previousSearch = '';
@@ -78,7 +79,7 @@
   }
 
   function handleSearchbarButtonClick() {
-    chrome.tabs.create({
+    browser.tabs.create({
       url: searchText.length ? getKpSearchUrl(searchText) : getKpChanceUrl(),
     });
   }

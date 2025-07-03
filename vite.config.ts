@@ -7,7 +7,7 @@ function root(...paths: string[]): string {
   return path.resolve(__dirname, ...paths);
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     svelte(),
     webExtension({
@@ -24,4 +24,7 @@ export default defineConfig({
       },
     },
   },
-});
+  build: {
+    minify: mode !== 'development',
+  },
+}));

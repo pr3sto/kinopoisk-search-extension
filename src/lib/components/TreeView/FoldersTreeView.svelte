@@ -96,6 +96,7 @@
 
   .treeview__folder__button__text {
     font-size: $font-size-primary;
+    line-height: $font-size-primary;
     color: $font-color-dark;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -104,7 +105,7 @@
 
   .folder-icon {
     display: inline-block;
-    vertical-align: text-bottom;
+    vertical-align: bottom;
     margin-right: 2px;
     width: $icon-width-regular;
     height: 1em;

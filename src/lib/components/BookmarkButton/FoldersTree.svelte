@@ -1,19 +1,19 @@
 <script lang="ts">
-  import type { BookmarkFolder } from '../../types/bookmark-folder';
-  import Self from './FoldersTreeView.svelte';
+  import type { BookmarkFolder } from './bookmarks.svelte';
+  import Self from './FoldersTree.svelte';
 
   interface Props {
     isRoot: boolean;
     folders: BookmarkFolder[];
-    folderClickCallback(folder: BookmarkFolder): void;
+    onFolderClick(folder: BookmarkFolder): void;
   }
 
-  let { isRoot, folders, folderClickCallback }: Props = $props();
+  let { isRoot, folders, onFolderClick }: Props = $props();
 
   function handleFolderButtonClick(event: MouseEvent, folder: BookmarkFolder) {
     event.stopPropagation();
     event.preventDefault();
-    folderClickCallback(folder);
+    onFolderClick(folder);
   }
 </script>
 
@@ -30,7 +30,7 @@
         </div>
       </button>
       {#if folder.children.length !== 0}
-        <Self isRoot={false} folders={folder.children} {folderClickCallback} />
+        <Self isRoot={false} folders={folder.children} {onFolderClick} />
       {/if}
     </div>
   {/each}

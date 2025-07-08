@@ -1,7 +1,12 @@
 import browser from 'webextension-polyfill';
-import type { BookmarkFolder } from '../types/bookmark-folder';
 
-const bookmarksState = $state<{
+export type BookmarkFolder = {
+  id: string;
+  title: string;
+  children: BookmarkFolder[];
+};
+
+const bookmarks = $state<{
   rootFolder: BookmarkFolder | null;
   urls: string[];
 }>({
@@ -9,7 +14,15 @@ const bookmarksState = $state<{
   urls: [],
 });
 
-function loadBookmarks(bookmarkNode: browser.Bookmarks.BookmarkTreeNode): {
+export default bookmarks;
+
+browser.bookmarks.getTree().then((bookmarkTreeNodes) => {
+  const { folder, urls } = __loadBookmarks(bookmarkTreeNodes[0]);
+  bookmarks.rootFolder = folder;
+  bookmarks.urls = urls;
+});
+
+function __loadBookmarks(bookmarkNode: browser.Bookmarks.BookmarkTreeNode): {
   folder: BookmarkFolder | null;
   urls: string[];
 } {
@@ -30,7 +43,7 @@ function loadBookmarks(bookmarkNode: browser.Bookmarks.BookmarkTreeNode): {
 
   // search children recursively
   bookmarkNode.children?.forEach((node) => {
-    const { folder: f, urls: u } = loadBookmarks(node);
+    const { folder: f, urls: u } = __loadBookmarks(node);
     if (f !== null) {
       folder.children.push(f);
     }
@@ -39,11 +52,3 @@ function loadBookmarks(bookmarkNode: browser.Bookmarks.BookmarkTreeNode): {
 
   return { folder, urls };
 }
-
-browser.bookmarks.getTree().then((bookmarkTreeNodes) => {
-  const { folder, urls } = loadBookmarks(bookmarkTreeNodes[0]);
-  bookmarksState.rootFolder = folder;
-  bookmarksState.urls = urls;
-});
-
-export default bookmarksState;

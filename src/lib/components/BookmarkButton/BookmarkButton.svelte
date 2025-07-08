@@ -1,9 +1,8 @@
 <script lang="ts">
   import browser from 'webextension-polyfill';
-  import bookmarksState from '../states/bookmarks.svelte';
-  import type { BookmarkFolder } from '../types/bookmark-folder';
-  import { isButtonEsc } from '../utils/buttons';
-  import FoldersTreeView from './TreeView/FoldersTreeView.svelte';
+  import bookmarks, { type BookmarkFolder } from './bookmarks.svelte';
+  import { isButtonEsc } from '../../utils/buttons';
+  import FoldersTree from './FoldersTree.svelte';
 
   interface Props {
     bookmarkTitle: string;
@@ -22,17 +21,17 @@
 
   let bookmarkElement: HTMLElement | null = $state(null);
   let bookmarkButton: HTMLElement | null = $state(null);
-  let isPopupOpened = $state(false);
-  let popupStyle = $state('');
+  let isPopoverOpened = $state(false);
+  let popoverStyle = $state('');
   let showBookmarkedAnimation = $state(false);
 
-  let popupHideTimeout: ReturnType<typeof setTimeout>;
+  let popoverHideTimeout: ReturnType<typeof setTimeout>;
 
   function handleBookmarkKeydown(event: KeyboardEvent) {
-    if (isButtonEsc(event) && isPopupOpened) {
+    if (isButtonEsc(event) && isPopoverOpened) {
       event.preventDefault();
       event.stopPropagation();
-      hidePopup();
+      hidePopover();
       bookmarkButton?.focus();
     }
   }
@@ -45,36 +44,36 @@
       return;
     }
 
-    if (isPopupOpened) {
-      hidePopup();
+    if (isPopoverOpened) {
+      hidePopover();
       return;
     }
 
     const buttonRect = (event.target as HTMLElement).getBoundingClientRect();
 
-    // popup position
+    // popover position
     if (buttonRect.top + 200 > document.body.clientHeight) {
-      popupStyle =
+      popoverStyle =
         buttonRect.top < 200
           ? `bottom:${buttonRect.top - 190}px;`
           : 'bottom:0;';
     } else {
-      popupStyle = 'top:0;';
+      popoverStyle = 'top:0;';
     }
 
-    isPopupOpened = true;
+    isPopoverOpened = true;
   }
 
   function handleBookmarkButtonMouseLeave() {
-    popupHideTimeout = setTimeout(hidePopup, 500);
+    popoverHideTimeout = setTimeout(hidePopover, 500);
   }
 
-  function handlePopupMouseEnter() {
-    clearTimeout(popupHideTimeout);
+  function handlePopoverMouseEnter() {
+    clearTimeout(popoverHideTimeout);
   }
 
-  function handlePopupMouseLeave() {
-    hidePopup();
+  function handlePopoverMouseLeave() {
+    popoverHideTimeout = setTimeout(hidePopover, 100);
   }
 
   function handleFocusout(event: FocusEvent) {
@@ -82,9 +81,9 @@
       return;
     }
 
-    // hide popup when element outside bookmark receives focus
+    // hide popover when element outside bookmark receives focus
     if (!bookmarkElement.contains(event.relatedTarget as HTMLElement)) {
-      hidePopup();
+      hidePopover();
     }
   }
 
@@ -97,20 +96,20 @@
       })
       .then((node) => {
         if (node.url) {
-          bookmarksState.urls.push(node.url);
+          bookmarks.urls.push(node.url);
           showBookmarkedAnimation = true;
         }
       });
 
-    hidePopup();
+    hidePopover();
   }
 
-  function hidePopup() {
-    isPopupOpened = false;
+  function hidePopover() {
+    isPopoverOpened = false;
   }
 </script>
 
-{#if bookmarksState.rootFolder !== null}
+{#if bookmarks.rootFolder !== null}
   <div
     bind:this={bookmarkElement}
     class="bookmark"
@@ -120,12 +119,12 @@
     onkeydown={handleBookmarkKeydown}>
     <button
       bind:this={bookmarkButton}
-      disabled={bookmarksState.urls.includes(bookmarkUrl)}
+      disabled={bookmarks.urls.includes(bookmarkUrl)}
       class="bookmark__button"
-      title={bookmarksState.urls.includes(bookmarkUrl)
+      title={bookmarks.urls.includes(bookmarkUrl)
         ? i18n_bookmarkedButtonTitle
         : i18n_addBookmarkButtonTitle}
-      aria-label={bookmarksState.urls.includes(bookmarkUrl)
+      aria-label={bookmarks.urls.includes(bookmarkUrl)
         ? i18n_bookmarkedButtonTitle
         : i18n_addBookmarkButtonTitle}
       onclick={handleBookmarkButtonClick}
@@ -133,29 +132,29 @@
     {#if showBookmarkedAnimation}
       <span class="bookmark__button__animation"></span>
     {/if}
-    {#if isPopupOpened}
+    {#if isPopoverOpened}
       <div
-        class="bookmark__popup"
-        style={popupStyle}
+        class="bookmark__popover"
+        style={popoverStyle}
         role="dialog"
         tabindex="-1"
-        onmouseenter={handlePopupMouseEnter}
-        onmouseleave={handlePopupMouseLeave}>
-        <FoldersTreeView
+        onmouseenter={handlePopoverMouseEnter}
+        onmouseleave={handlePopoverMouseLeave}>
+        <FoldersTree
           isRoot={true}
-          folders={bookmarksState.rootFolder.children}
-          folderClickCallback={createBookmark} />
+          folders={bookmarks.rootFolder.children}
+          onFolderClick={createBookmark} />
       </div>
     {/if}
   </div>
 {/if}
 
 <style lang="scss">
-  @use '../styles/colors.scss' as *;
-  @use '../styles/dimensions.scss' as *;
+  @use '../../styles/colors.scss' as *;
+  @use '../../styles/dimensions.scss' as *;
 
-  $bookmark-popup-width: 200px;
-  $bookmark-popup-height: 200px;
+  $bookmark-popover-width: 200px;
+  $bookmark-popover-height: 200px;
 
   .bookmark {
     position: relative;
@@ -209,11 +208,11 @@
     }
   }
 
-  .bookmark__popup {
+  .bookmark__popover {
     position: absolute;
     right: 150%;
-    max-width: $bookmark-popup-width;
-    max-height: $bookmark-popup-height;
+    max-width: $bookmark-popover-width;
+    max-height: $bookmark-popover-height;
     background-color: $background-color-base;
     border-radius: $border-radius;
     box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.2);

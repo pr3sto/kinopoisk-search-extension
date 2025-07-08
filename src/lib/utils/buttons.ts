@@ -4,16 +4,6 @@ export function isButtonEnter(event: KeyboardEvent) {
   );
 }
 
-export function isButtonEsc(event: KeyboardEvent) {
-  return (
-    event.key === 'Escape' ||
-    event.key === 'Esc' ||
-    event.code === 'Escape' ||
-    event.code === 'Esc' ||
-    event.keyCode === 27
-  );
-}
-
 export function isButtonDown(event: KeyboardEvent) {
   return (
     event.key === 'ArrowDown' ||

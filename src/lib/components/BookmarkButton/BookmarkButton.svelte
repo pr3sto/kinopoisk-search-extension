@@ -1,7 +1,6 @@
 <script lang="ts">
   import browser from 'webextension-polyfill';
   import bookmarks, { type BookmarkFolder } from './bookmarks.svelte';
-  import { isButtonEsc } from '../../utils/buttons';
   import FoldersTree from './FoldersTree.svelte';
 
   interface Props {
@@ -19,22 +18,13 @@
     'bookmarkedButtonTitle',
   );
 
-  let bookmarkElement: HTMLElement | null = $state(null);
   let bookmarkButton: HTMLElement | null = $state(null);
+  let popoverElement: HTMLElement | null = $state(null);
   let isPopoverOpened = $state(false);
   let popoverStyle = $state('');
   let showBookmarkedAnimation = $state(false);
 
   let popoverHideTimeout: ReturnType<typeof setTimeout>;
-
-  function handleBookmarkKeydown(event: KeyboardEvent) {
-    if (isButtonEsc(event) && isPopoverOpened) {
-      event.preventDefault();
-      event.stopPropagation();
-      hidePopover();
-      bookmarkButton?.focus();
-    }
-  }
 
   function handleBookmarkButtonClick(event: MouseEvent) {
     event.stopPropagation();
@@ -64,8 +54,12 @@
     isPopoverOpened = true;
   }
 
+  function handleBookmarkButtonMouseEnter() {
+    clearTimeout(popoverHideTimeout);
+  }
+
   function handleBookmarkButtonMouseLeave() {
-    popoverHideTimeout = setTimeout(hidePopover, 500);
+    popoverHideTimeout = setTimeout(hidePopover, 300);
   }
 
   function handlePopoverMouseEnter() {
@@ -77,12 +71,12 @@
   }
 
   function handleFocusout(event: FocusEvent) {
-    if (!bookmarkElement || !event.relatedTarget) {
+    if (!popoverElement || !event.relatedTarget) {
       return;
     }
 
-    // hide popover when element outside bookmark receives focus
-    if (!bookmarkElement.contains(event.relatedTarget as HTMLElement)) {
+    // hide popover when element outside receives focus
+    if (!popoverElement.contains(event.relatedTarget as HTMLElement)) {
       hidePopover();
     }
   }
@@ -110,13 +104,7 @@
 </script>
 
 {#if bookmarks.rootFolder !== null}
-  <div
-    bind:this={bookmarkElement}
-    class="bookmark"
-    role="button"
-    tabindex="-1"
-    onfocusout={handleFocusout}
-    onkeydown={handleBookmarkKeydown}>
+  <div class="bookmark">
     <button
       bind:this={bookmarkButton}
       disabled={bookmarks.urls.includes(bookmarkUrl)}
@@ -128,18 +116,22 @@
         ? i18n_bookmarkedButtonTitle
         : i18n_addBookmarkButtonTitle}
       onclick={handleBookmarkButtonClick}
-      onmouseleave={handleBookmarkButtonMouseLeave}></button>
+      onmouseenter={handleBookmarkButtonMouseEnter}
+      onmouseleave={handleBookmarkButtonMouseLeave}
+      onfocusout={handleFocusout}></button>
     {#if showBookmarkedAnimation}
       <span class="bookmark__button__animation"></span>
     {/if}
     {#if isPopoverOpened}
       <div
+        bind:this={popoverElement}
         class="bookmark__popover"
         style={popoverStyle}
         role="dialog"
         tabindex="-1"
         onmouseenter={handlePopoverMouseEnter}
-        onmouseleave={handlePopoverMouseLeave}>
+        onmouseleave={handlePopoverMouseLeave}
+        onfocusout={handleFocusout}>
         <FoldersTree
           isRoot={true}
           folders={bookmarks.rootFolder.children}
@@ -218,5 +210,15 @@
     box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.2);
     overflow-y: scroll;
     z-index: 1;
+    animation: opacity 0.1s ease-out;
+  }
+
+  @keyframes opacity {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
   }
 </style>

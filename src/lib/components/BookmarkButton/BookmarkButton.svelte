@@ -18,7 +18,6 @@
     'bookmarkedButtonTitle',
   );
 
-  let bookmarkButton: HTMLElement | null = $state(null);
   let popoverElement: HTMLElement | null = $state(null);
   let isPopoverOpened = $state(false);
   let popoverStyle = $state('');
@@ -106,7 +105,6 @@
 {#if bookmarks.rootFolder !== null}
   <div class="bookmark">
     <button
-      bind:this={bookmarkButton}
       disabled={bookmarks.urls.includes(bookmarkUrl)}
       class="bookmark__button"
       title={bookmarks.urls.includes(bookmarkUrl)

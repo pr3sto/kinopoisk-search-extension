@@ -34,7 +34,7 @@
       {/if}
     </ul>
   {/each}
-  </li>
+</li>
 
 <style lang="scss">
   @use '../../styles/colors.scss' as *;

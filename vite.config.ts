@@ -1,4 +1,5 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import autoprefixer from 'autoprefixer';
 import path from 'path';
 import { defineConfig } from 'vite';
 import webExtension from 'vite-plugin-web-extension';
@@ -22,6 +23,9 @@ export default defineConfig(({ mode }) => ({
       scss: {
         api: 'modern-compiler',
       },
+    },
+    postcss: {
+      plugins: [autoprefixer()],
     },
   },
   build: {

@@ -13,7 +13,8 @@ body,
 button,
 li,
 ul,
-h2 {
+h2,
+p {
   padding: 0;
   margin: 0;
   font-weight: normal;

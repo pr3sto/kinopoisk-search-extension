@@ -5,14 +5,23 @@ html {
 body {
   width: 440px;
   background: #222;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 html,
 body,
-button {
+button,
+li,
+ul,
+h2 {
   padding: 0;
   margin: 0;
+  font-weight: normal;
+}
+
+li,
+ul {
+  list-style: none;
 }
 
 *,

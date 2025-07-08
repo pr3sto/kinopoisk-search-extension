@@ -136,13 +136,13 @@
 
 <svelte:window onkeydown={handleWindowKeydown} />
 
-<div id="logo">
+<header id="logo">
   <a href="https://www.kinopoisk.ru/" target="_blank">
     <img alt="https://www.kinopoisk.ru/" />
   </a>
-</div>
+</header>
 
-<div id="searchbar">
+<search id="searchbar">
   <input
     bind:this={searchInput}
     bind:value={searchText}
@@ -157,9 +157,9 @@
     title={i18n_searchIconTitle}
     aria-label={i18n_searchIconTitle}
     onclick={handleSearchbarButtonClick}></button>
-</div>
+</search>
 
-<div id="suggestions" class={suggestionsLoading ? 'loading' : ''}>
+<main id="suggestions" class={suggestionsLoading ? 'loading' : ''}>
   {#if suggestionsLoading}
     <div id="suggestions__loader">
       <span id="suggestions__loader__spinner"></span>
@@ -170,32 +170,32 @@
       <span id="suggestions__empty">{i18n_noSuggestionsFound}</span>
     {:else}
       {#if suggestions.first}
-        <div class="suggestions__section">
-          <div class="suggestions__section__header">
-            <span>{i18n_firstSuggestionHeader}</span>
-          </div>
+        <section class="suggestions__section">
+          <h2 class="suggestions__section__header">
+            {i18n_firstSuggestionHeader}
+          </h2>
           <SuggestionItem item={suggestions.first} />
-        </div>
+        </section>
       {/if}
       {#if suggestions.movies.length}
-        <div class="suggestions__section">
-          <div class="suggestions__section__header">
-            <span>{i18n_movieSuggestionHeader}</span>
-          </div>
+        <section class="suggestions__section">
+          <h2 class="suggestions__section__header">
+            {i18n_movieSuggestionHeader}
+          </h2>
           {#each suggestions.movies as item}
             <SuggestionItem {item} />
           {/each}
-        </div>
+        </section>
       {/if}
       {#if suggestions.persons.length}
-        <div class="suggestions__section">
-          <div class="suggestions__section__header">
-            <span>{i18n_personSuggestionHeader}</span>
-          </div>
+        <section class="suggestions__section">
+          <h2 class="suggestions__section__header">
+            {i18n_personSuggestionHeader}
+          </h2>
           {#each suggestions.persons as item}
             <SuggestionItem {item} />
           {/each}
-        </div>
+        </section>
       {/if}
     {/if}
     <a
@@ -205,7 +205,7 @@
       target="_blank"
       data-navigation-item>{i18n_showAllMessage}</a>
   {/if}
-</div>
+</main>
 
 <style lang="scss">
   @use '../styles/colors.scss' as *;

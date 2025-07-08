@@ -17,24 +17,24 @@
   }
 </script>
 
-<div class={isRoot ? 'treeview-root' : 'treeview'}>
+<li class={isRoot ? 'treeview-root' : 'treeview'}>
   {#each folders as folder}
-    <div class="treeview__folder">
+    <ul class="treeview__folder">
       <button
         class="treeview__folder__button"
         data-navigation-item
         onclick={(e) => handleFolderButtonClick(e, folder)}>
-        <div class="treeview__folder__button__text">
+        <span class="treeview__folder__button__text">
           <span class="folder-icon"></span>
           <span title={folder.title}>{folder.title}</span>
-        </div>
+        </span>
       </button>
       {#if folder.children.length !== 0}
         <Self isRoot={false} folders={folder.children} {onFolderClick} />
       {/if}
-    </div>
+    </ul>
   {/each}
-</div>
+  </li>
 
 <style lang="scss">
   @use '../../styles/colors.scss' as *;

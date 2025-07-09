@@ -22,7 +22,6 @@
     <ul class="treeview__folder">
       <button
         class="treeview__folder__button"
-        data-navigation-item
         onclick={(e) => handleFolderButtonClick(e, folder)}>
         <span class="treeview__folder__button__text">
           <span class="folder-icon"></span>

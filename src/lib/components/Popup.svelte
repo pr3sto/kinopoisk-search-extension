@@ -7,7 +7,6 @@
     getKpSuggestionsAsync,
   } from '../api/kinopoisk';
   import type { Suggestions } from '../types/suggestions';
-  import { isButtonDown, isButtonUp } from '../utils/buttons';
   import { debounce } from '../utils/debounce';
   import SuggestionItem from './SuggestionItem.svelte';
 
@@ -41,42 +40,6 @@
 
   // delay api call when user type search input
   const debouncedLoadSuggestions = debounce(loadSuggestions, 200);
-
-  function handleWindowKeydown(event: KeyboardEvent) {
-    if (event.target === null || !(isButtonUp(event) || isButtonDown(event))) {
-      return;
-    }
-
-    const navigationItems = Array.from(
-      document.querySelectorAll<HTMLElement>('[data-navigation-item]'),
-    );
-    if (navigationItems.length === 0) {
-      return;
-    }
-
-    event.stopPropagation();
-    event.preventDefault();
-
-    const currentNavigationItem = (event.target as HTMLElement).closest(
-      '[data-navigation-item]',
-    ) as HTMLElement | null;
-
-    let currentPosition = currentNavigationItem
-      ? navigationItems.indexOf(currentNavigationItem)
-      : -1;
-
-    if (currentPosition === -1) {
-      navigationItems[0].focus();
-    }
-
-    let nextPosition = isButtonDown(event)
-      ? currentPosition + 1
-      : currentPosition - 1;
-
-    if (nextPosition >= 0 && nextPosition < navigationItems.length) {
-      navigationItems[nextPosition].focus();
-    }
-  }
 
   function handleSearchbarButtonClick() {
     browser.tabs.create({
@@ -134,8 +97,6 @@
   });
 </script>
 
-<svelte:window onkeydown={handleWindowKeydown} />
-
 <header id="logo">
   <a href="https://www.kinopoisk.ru/" target="_blank">
     <img alt="https://www.kinopoisk.ru/" />
@@ -150,7 +111,6 @@
     type="text"
     autocomplete="off"
     placeholder={i18n_searchPlaceholder}
-    data-navigation-item
     oninput={handleSearchbarInput} />
   <button
     id="searchbar__button"

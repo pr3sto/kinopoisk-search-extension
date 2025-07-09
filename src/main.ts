@@ -1,6 +1,6 @@
 import { mount } from 'svelte';
-import './global.css';
 import Popup from './lib/components/Popup.svelte';
+import './styles/global.css';
 
 const target = document.getElementById('popup');
 if (!target) {

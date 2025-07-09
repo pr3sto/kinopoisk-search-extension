@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import browser from 'webextension-polyfill';
   import bookmarks, { type BookmarkFolder } from './bookmarks.svelte';
   import FoldersTree from './FoldersTree.svelte';
@@ -18,11 +19,13 @@
     'bookmarkedButtonTitle',
   );
 
+  // bookmark button state
+  let showBookmarkedAnimation = $state(false);
+
+  // popover state
   let popoverElement: HTMLElement | null = $state(null);
   let isPopoverOpened = $state(false);
   let popoverStyle = $state('');
-  let showBookmarkedAnimation = $state(false);
-
   let popoverHideTimeout: ReturnType<typeof setTimeout>;
 
   function handleBookmarkButtonClick(event: MouseEvent) {
@@ -41,13 +44,13 @@
     const buttonRect = (event.target as HTMLElement).getBoundingClientRect();
 
     // popover position
-    if (buttonRect.top + 200 > document.body.clientHeight) {
-      popoverStyle =
-        buttonRect.top < 200
-          ? `bottom:${buttonRect.top - 190}px;`
-          : 'bottom:0;';
+    if (buttonRect.top + 200 < document.body.clientHeight) {
+      popoverStyle = 'top:10%;';
     } else {
-      popoverStyle = 'top:0;';
+      popoverStyle =
+        buttonRect.bottom > 200
+          ? 'bottom:10%;'
+          : `bottom:${buttonRect.bottom - 210}px;`;
     }
 
     isPopoverOpened = true;
@@ -100,6 +103,10 @@
   function hidePopover() {
     isPopoverOpened = false;
   }
+
+  onDestroy(() => {
+    clearTimeout(popoverHideTimeout);
+  });
 </script>
 
 {#if bookmarks.rootFolder !== null}
@@ -130,10 +137,12 @@
         onmouseenter={handlePopoverMouseEnter}
         onmouseleave={handlePopoverMouseLeave}
         onfocusout={handleFocusout}>
-        <FoldersTree
-          isRoot={true}
-          folders={bookmarks.rootFolder.children}
-          onFolderClick={createBookmark} />
+        <div class="bookmark__popover__scrollable">
+          <FoldersTree
+            isRoot={true}
+            folders={bookmarks.rootFolder.children}
+            onFolderClick={createBookmark} />
+        </div>
       </div>
     {/if}
   </div>
@@ -199,16 +208,21 @@
   }
 
   .bookmark__popover {
+    display: flex;
     position: absolute;
-    right: 150%;
+    right: calc(100% + $spacing-horizontal-sm);
     max-width: $bookmark-popover-width;
     max-height: $bookmark-popover-height;
     background-color: $background-color-base;
     border-radius: $border-radius;
     box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.2);
-    overflow-y: scroll;
+    overflow: hidden;
     z-index: 1;
     animation: opacity 0.1s ease-out;
+
+    &__scrollable {
+      overflow-y: auto;
+    }
   }
 
   @keyframes opacity {

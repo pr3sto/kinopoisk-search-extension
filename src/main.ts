@@ -1,5 +1,6 @@
 import { mount } from 'svelte';
 import Popup from './lib/components/Popup.svelte';
+import './lib/utils/arrow-navigation';
 import './styles/global.css';
 
 const target = document.getElementById('popup');

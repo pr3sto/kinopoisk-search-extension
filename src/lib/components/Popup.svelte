@@ -208,8 +208,8 @@
 </main>
 
 <style lang="scss">
-  @use '../styles/colors.scss' as *;
-  @use '../styles/dimensions.scss' as *;
+  @use '/src/styles/colors.scss' as *;
+  @use '/src/styles/dimensions.scss' as *;
 
   $empty-suggestions-height: 100px;
   $spinner-width: 25px;

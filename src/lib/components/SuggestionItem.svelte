@@ -60,8 +60,8 @@
 </div>
 
 <style lang="scss">
-  @use '../styles/colors.scss' as *;
-  @use '../styles/dimensions.scss' as *;
+  @use '/src/styles/colors.scss' as *;
+  @use '/src/styles/dimensions.scss' as *;
 
   .suggestion-item {
     display: flex;

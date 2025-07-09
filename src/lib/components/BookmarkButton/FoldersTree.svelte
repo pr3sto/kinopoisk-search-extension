@@ -37,8 +37,8 @@
 </li>
 
 <style lang="scss">
-  @use '../../styles/colors.scss' as *;
-  @use '../../styles/dimensions.scss' as *;
+  @use '/src/styles/colors.scss' as *;
+  @use '/src/styles/dimensions.scss' as *;
 
   $tree-indication: 1px solid $background-color-dark;
 

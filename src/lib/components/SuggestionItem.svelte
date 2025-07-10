@@ -17,7 +17,7 @@
   }
 
   function getRatingTag(): string {
-    if (item.__typename !== 'MovieItem') {
+    if (item.__typename !== 'MovieItem' || !item.rating) {
       return 'none';
     } else if (item.rating && item.rating >= 7) {
       return 'positive';
@@ -84,6 +84,10 @@
     overflow: hidden;
     text-decoration: none;
     outline: none;
+
+    &:only-child {
+      padding-right: 0;
+    }
   }
 
   .item__link-viewoption {

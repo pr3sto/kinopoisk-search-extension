@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import { fade } from 'svelte/transition';
   import browser from 'webextension-polyfill';
   import bookmarks, { type BookmarkFolder } from './bookmarks.svelte';
   import FoldersTree from './FoldersTree.svelte';
@@ -130,6 +131,8 @@
     {#if isPopoverOpened}
       <div
         bind:this={popoverElement}
+        in:fade={{ duration: 50 }}
+        out:fade={{ duration: 50 }}
         class="bookmark__popover"
         style={popoverStyle}
         role="dialog"
@@ -137,7 +140,7 @@
         onmouseenter={handlePopoverMouseEnter}
         onmouseleave={handlePopoverMouseLeave}
         onfocusout={handleFocusout}>
-        <div class="bookmark__popover__scrollable">
+        <div class="bookmark__popover__content">
           <FoldersTree
             isRoot={true}
             folders={bookmarks.rootFolder.children}
@@ -160,7 +163,7 @@
   }
 
   .bookmark__button {
-    width: $icon-width-regular;
+    width: $icon-size;
     height: 100%;
     border: none;
     background: $font-color-light;
@@ -218,19 +221,9 @@
     box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     z-index: 1;
-    animation: opacity 0.1s ease-out;
 
-    &__scrollable {
+    &__content {
       overflow-y: auto;
-    }
-  }
-
-  @keyframes opacity {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
     }
   }
 </style>

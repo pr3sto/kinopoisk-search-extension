@@ -211,7 +211,7 @@
   #searchbar__button {
     position: absolute;
     right: 13px;
-    width: $icon-width-regular;
+    width: $icon-size;
     height: 100%;
     border: none;
     background: $font-color-light;
@@ -307,8 +307,8 @@
       content: '';
       position: absolute;
       top: 0;
-      right: $icon-width-small;
-      width: $icon-width-small;
+      right: $icon-size-sm;
+      width: $icon-size-sm;
       height: 100%;
       background: $font-color-light;
       mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 48 48'%3E%3Cpath d='M40.96 4.98a2 2 0 0 0-.22.02H28a2 2 0 1 0 0 4h8.172L22.586 22.586a2 2 0 1 0 2.828 2.828L39 11.828V20a2 2 0 1 0 4 0V7.246a2 2 0 0 0-2.04-2.266M12.5 8C8.383 8 5 11.383 5 15.5v20c0 4.117 3.383 7.5 7.5 7.5h20c4.117 0 7.5-3.383 7.5-7.5V26a2 2 0 1 0-4 0v9.5c0 1.947-1.553 3.5-3.5 3.5h-20A3.483 3.483 0 0 1 9 35.5v-20c0-1.947 1.553-3.5 3.5-3.5H22a2 2 0 1 0 0-4z'/%3E%3C/svg%3E")

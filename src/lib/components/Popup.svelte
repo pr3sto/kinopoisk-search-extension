@@ -175,7 +175,9 @@
   $spinner-width: 25px;
 
   #logo {
-    margin: $margin-global;
+    margin-top: $margin-global;
+    margin-left: $margin-global;
+    margin-right: $margin-global;
 
     & a {
       display: inline-block;
@@ -188,7 +190,9 @@
 
   #searchbar {
     position: relative;
-    margin: $margin-global;
+    margin-left: $margin-global;
+    margin-right: $margin-global;
+    margin-bottom: $margin-global;
   }
 
   #searchbar__input {

@@ -1,6 +1,5 @@
 {
   "manifest_version": 3,
-  "version": "3.2.0",
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
   "homepage_url": "https://github.com/pr3sto/kinopoisk-search-extension",
@@ -17,7 +16,7 @@
       "32": "icons/kinopoisk32.png",
       "48": "icons/kinopoisk48.png"
     },
-    "default_popup": "src/popup.html"
+    "default_popup": "src/popup/popup.html"
   },
   "{{chrome}}.background": {
     "service_worker": "src/background/context-menu.ts"

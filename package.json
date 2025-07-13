@@ -1,7 +1,7 @@
 {
   "name": "kinopoisk-search-extension",
   "private": true,
-  "version": "1.0.0",
+  "version": "3.2.0",
   "type": "module",
   "scripts": {
     "dev:chrome": "cross-env TARGET=chrome vite build --watch --mode development",

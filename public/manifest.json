@@ -26,6 +26,11 @@
       "src/background/context-menu.ts"
     ]
   },
+  "{{firefox}}.browser_specific_settings": {
+    "gecko": {
+      "id": "kinopoisk-search-extension@alexeychirukhin.com"
+    }
+  },
   "permissions": ["contextMenus", "bookmarks"],
   "host_permissions": ["https://www.kinopoisk.ru/*"]
 }
